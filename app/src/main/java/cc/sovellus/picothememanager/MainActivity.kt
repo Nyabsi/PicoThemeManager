@@ -25,8 +25,15 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ElevatedCard
+import androidx.compose.material3.ExtendedFloatingActionButton
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.ui.Modifier
@@ -66,7 +73,32 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             ThemetoolTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
+                Scaffold(
+                    floatingActionButton = {
+                        ExtendedFloatingActionButton(
+                            onClick = {
+                                Settings.Global.putString(
+                                    context.contentResolver,
+                                    "SceneManager.CurPackage",
+                                    null
+                                )
+                                Settings.Global.putString(
+                                    context.contentResolver,
+                                    "SceneManager.CurrentScene",
+                                    ""
+                                )
+                                Settings.Global.putString(
+                                    context.contentResolver,
+                                    "current_scene",
+                                    "default_scene"
+                                )
+                                restartShell()
+                            },
+                            icon = { Icon(Icons.Filled.Refresh, null) },
+                            text = { Text(text = "Reset Environment") },
+                        )
+                    },
+                    modifier = Modifier.fillMaxSize()) { innerPadding ->
                     Column(
                         modifier = Modifier
                             .padding(

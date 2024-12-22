@@ -1,10 +1,15 @@
 # Pico Theme Manager
 
-https://github.com/user-attachments/assets/076c91bf-7f20-4cc0-8fe2-c13d97aa7ad9
+Pico Theme Manager is a tool to help you easily switch between custom Pico OS themes on your Pico device.
 
 > This software is under development, the author is not responsible for any damage caused by the software.
 
-Pico Theme Manager is a tool to help you easily switch between custom Pico OS themes on your Pico device.
+
+https://github.com/user-attachments/assets/076c91bf-7f20-4cc0-8fe2-c13d97aa7ad9
+
+## Installation
+
+You can download latest version of the apk from [here](https://github.com/Nyabsi/PicoThemeManager/releases) you will need adb to complete the installation
 
 > ⚠️ PicoThemeManager requires permission "android.permission.WRITE_SECURE_SETTINGS" ⚠️
 

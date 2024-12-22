@@ -141,7 +141,8 @@ class MainActivity : ComponentActivity() {
                     floatingActionButton = {
                         ExtendedFloatingActionButton(
                             onClick = {
-
+                                environmentManager.resetEnvironment()
+                                environmentManager.forceVrShellRestart()
                             },
                             icon = { Icon(Icons.Filled.Refresh, null) },
                             text = { Text(text = "Reset Environment") },

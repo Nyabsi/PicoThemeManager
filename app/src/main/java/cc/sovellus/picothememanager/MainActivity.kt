@@ -9,6 +9,7 @@ import android.content.pm.PackageInfo
 import android.graphics.BitmapFactory
 import android.os.Bundle
 import android.provider.Settings
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -67,7 +68,12 @@ class MainActivity : ComponentActivity() {
             ThemetoolTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
                     Column(
-                        modifier = Modifier.padding(top = innerPadding.calculateTopPadding(), bottom = innerPadding.calculateBottomPadding()).fillMaxSize()
+                        modifier = Modifier
+                            .padding(
+                                top = innerPadding.calculateTopPadding(),
+                                bottom = innerPadding.calculateBottomPadding()
+                            )
+                            .fillMaxSize()
                     ) {
                         LazyVerticalGrid(
                             columns = GridCells.Fixed(4),
@@ -79,50 +85,75 @@ class MainActivity : ComponentActivity() {
                             ),
                             content = {
                                 items(getPackageList()) {
-
                                     val resources = packageManager.getResourcesForApplication(it.packageName)
-                                    val sceneTag = resources.getString(resources.getIdentifier("sceneTag", "string", it.packageName))
-                                    val sceneName = resources.getString(resources.getIdentifier("SceneName_$sceneTag", "string", it.packageName))
+                                    val sceneTagId = resources.getIdentifier("sceneTag", "string", it.packageName)
 
-                                    val asset = context.packageManager.getResourcesForApplication(it.packageName).assets.open("thumbs/${sceneTag}/Scene_${sceneTag}_1_1.png")
+                                    if (sceneTagId > 0) {
 
-                                    ElevatedCard(
-                                        elevation = CardDefaults.cardElevation(
-                                            defaultElevation = 2.dp
-                                        ),
-                                        modifier = Modifier
-                                            .padding(4.dp)
-                                            .fillMaxWidth()
-                                            .height(180.dp)
-                                            .width(200.dp)
-                                            .clickable(onClick = {
-                                                Settings.Global.putString(context.contentResolver, "SceneManager.CurPackage", it.packageName)
-                                                Settings.Global.putString(context.contentResolver, "SceneManager.CurrentScene", sceneTag)
-                                                Settings.Global.putString(context.contentResolver, "current_scene", "/assets/scene/$sceneTag/Scene_${sceneTag}_1_1.unity3d")
-                                                restartShell()
-                                            })
-                                    ) {
+                                        val sceneTag = resources.getString(sceneTagId)
+                                        val sceneNameId = resources.getIdentifier("SceneName_$sceneTag", "string", it.packageName)
 
-                                        GlideImage(
-                                            model = BitmapFactory.decodeStream(asset),
-                                            contentDescription = null,
-                                            modifier = Modifier
-                                                .fillMaxWidth()
-                                                .height(150.dp)
-                                                .width(200.dp),
-                                            contentScale = ContentScale.Crop
-                                        )
-
-                                        Row(
-                                            modifier = Modifier.padding(4.dp)
-                                        ) {
-                                            Text(
-                                                text = sceneName,
-                                                textAlign = TextAlign.Start,
-                                                maxLines = 1,
-                                                overflow = TextOverflow.Ellipsis
-                                            )
+                                        var sceneName = sceneTag
+                                        if (sceneNameId > 0) {
+                                           sceneName = resources.getString(sceneNameId)
+                                        } else {
+                                            Log.e("PicoThemeManager", "sceneNameId was 0 for ${it.packageName}")
                                         }
+
+                                        val asset = context.packageManager.getResourcesForApplication(it.packageName).assets.open("thumbs/${sceneTag}/Scene_${sceneTag}_1_1.png")
+
+                                        ElevatedCard(
+                                            elevation = CardDefaults.cardElevation(
+                                                defaultElevation = 2.dp
+                                            ),
+                                            modifier = Modifier
+                                                .padding(4.dp)
+                                                .fillMaxWidth()
+                                                .height(180.dp)
+                                                .width(200.dp)
+                                                .clickable(onClick = {
+                                                    Settings.Global.putString(
+                                                        context.contentResolver,
+                                                        "SceneManager.CurPackage",
+                                                        it.packageName
+                                                    )
+                                                    Settings.Global.putString(
+                                                        context.contentResolver,
+                                                        "SceneManager.CurrentScene",
+                                                        sceneTag
+                                                    )
+                                                    Settings.Global.putString(
+                                                        context.contentResolver,
+                                                        "current_scene",
+                                                        "/assets/scene/$sceneTag/Scene_${sceneTag}_1_1.unity3d"
+                                                    )
+                                                    restartShell()
+                                                })
+                                        ) {
+
+                                            GlideImage(
+                                                model = BitmapFactory.decodeStream(asset),
+                                                contentDescription = null,
+                                                modifier = Modifier
+                                                    .fillMaxWidth()
+                                                    .height(150.dp)
+                                                    .width(200.dp),
+                                                contentScale = ContentScale.Crop
+                                            )
+
+                                            Row(
+                                                modifier = Modifier.padding(4.dp)
+                                            ) {
+                                                Text(
+                                                    text = sceneName,
+                                                    textAlign = TextAlign.Start,
+                                                    maxLines = 1,
+                                                    overflow = TextOverflow.Ellipsis
+                                                )
+                                            }
+                                        }
+                                    } else {
+                                        Log.e("PicoThemeManager", "sceneTagId was 0 for ${it.packageName}")
                                     }
                                 }
                             }

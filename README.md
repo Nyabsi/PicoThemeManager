@@ -4,6 +4,16 @@
 
 Pico Theme Manager is a tool to help you easily switch between custom Pico OS themes on your Pico device.
 
+> ⚠️ PicoThemeManager requires permission "android.permission.WRITE_SECURE_SETTINGS" otherwise it will crash ⚠️
+
+you need adb and Developer Mode enabled to grant permissions to Pico Theme Manager.
+
+Grant "android.permission.WRITE_SECURE_SETTINGS" to PicoThemeManager:
+
+```
+adb shell pm grant cc.sovellus.picothememanager android.permission.WRITE_SECURE_SETTINGS
+```
+
 ## Compatibility
 
 This software has been tested on Pico 4 Ultra and Pico 4

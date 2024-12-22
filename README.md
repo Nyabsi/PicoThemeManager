@@ -1,6 +1,6 @@
 # Pico Theme Manager
 
-https://github.com/user-attachments/assets/3190d019-bb43-41eb-8659-ba6dd40e4704
+https://github.com/user-attachments/assets/076c91bf-7f20-4cc0-8fe2-c13d97aa7ad9
 
 > This software is under development, the author is not responsible for any damage caused by the software.
 

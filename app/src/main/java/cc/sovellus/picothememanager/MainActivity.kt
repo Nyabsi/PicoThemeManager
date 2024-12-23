@@ -9,9 +9,12 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.hoverable
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsHoveredAsState
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -19,27 +22,36 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.LazyHorizontalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Refresh
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.ElevatedCard
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.zIndex
 import cc.sovellus.picothememanager.manager.EnvironmentManager
 import cc.sovellus.picothememanager.ui.theme.ThemetoolTheme
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
@@ -52,15 +64,15 @@ fun DisplayEnvironments(list: List<PackageInfo>, environmentManager: Environment
 
     val context = LocalContext.current
 
-    LazyVerticalGrid(
-        columns = GridCells.Fixed(4),
+    LazyHorizontalGrid(
+        rows = GridCells.Fixed(1),
         contentPadding = PaddingValues(
             start = 12.dp,
             top = 16.dp,
             end = 16.dp,
             bottom = 16.dp
         ),
-        modifier = Modifier.heightIn(max = 1000.dp),
+        modifier = Modifier.heightIn(max = 140.dp),
         content = {
             items(list) {
                 val resources = context.packageManager.getResourcesForApplication(it.packageName)
@@ -78,16 +90,16 @@ fun DisplayEnvironments(list: List<PackageInfo>, environmentManager: Environment
                         Log.e("PicoThemeManager", "sceneNameId was 0 for ${it.packageName}")
                     }
 
-                    val asset = context.packageManager.getResourcesForApplication(it.packageName).assets.open("thumbs/${sceneTag}/Scene_${sceneTag}_1_1.png")
+                    val bitmap = remember { BitmapFactory.decodeStream(context.packageManager.getResourcesForApplication(it.packageName).assets.open("thumbs/${sceneTag}/Scene_${sceneTag}_1_1.png")) }
 
-                    ElevatedCard(
-                        elevation = CardDefaults.cardElevation(
-                            defaultElevation = 2.dp
-                        ),
+                    val interactionSource = remember { MutableInteractionSource() }
+                    val isHovered by interactionSource.collectIsHoveredAsState()
+
+                    Box(
                         modifier = Modifier
                             .padding(4.dp)
                             .fillMaxWidth()
-                            .height(180.dp)
+                            .height(120.dp)
                             .width(200.dp)
                             .clickable(onClick = {
                                 environmentManager.setEnvironment(
@@ -97,26 +109,31 @@ fun DisplayEnvironments(list: List<PackageInfo>, environmentManager: Environment
                                 )
                                 environmentManager.forceVrShellRestart()
                             })
+                            .hoverable(interactionSource),
+                        contentAlignment = Alignment.TopStart
                     ) {
-
                         GlideImage(
-                            model = BitmapFactory.decodeStream(asset),
+                            model = bitmap,
                             contentDescription = null,
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .height(150.dp)
-                                .width(200.dp),
-                            contentScale = ContentScale.Crop
+                                .height(120.dp)
+                                .width(200.dp)
+                                .zIndex(0f)
+                                .clip(RoundedCornerShape(10)),
+                            contentScale = ContentScale.Crop,
+                            alpha = if (isHovered) { 0.4f } else { 1.0f },
                         )
-
-                        Row(
-                            modifier = Modifier.padding(4.dp)
-                        ) {
+                        if (isHovered) {
                             Text(
                                 text = sceneName,
+                                modifier = Modifier
+                                    .padding(4.dp)
+                                    .zIndex(1f),
                                 textAlign = TextAlign.Start,
                                 maxLines = 1,
-                                overflow = TextOverflow.Ellipsis
+                                overflow = TextOverflow.Ellipsis,
+                                color = Color.White
                             )
                         }
                     }
@@ -132,6 +149,7 @@ class MainActivity : ComponentActivity() {
 
     private lateinit var environmentManager: EnvironmentManager
 
+    @OptIn(ExperimentalMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -142,8 +160,23 @@ class MainActivity : ComponentActivity() {
             ThemetoolTheme {
                 val rememberScroll = rememberScrollState()
                 Scaffold(
+                    topBar = {
+                        TopAppBar(
+                            title = {
+                                Text(
+                                    text = stringResource(id = R.string.app_name),
+                                    maxLines = 1,
+                                    overflow = TextOverflow.Ellipsis
+                                )
+                            },
+                            colors = TopAppBarDefaults.topAppBarColors().copy(containerColor = Color(0xff292929)),
+                        )
+                    },
+                    containerColor = Color(0xff292929),
                     floatingActionButton = {
                         ExtendedFloatingActionButton(
+                            containerColor = Color(0xff424242),
+                            contentColor = Color(0xffffffff),
                             onClick = {
                                 environmentManager.resetEnvironment()
                                 environmentManager.forceVrShellRestart()
@@ -166,7 +199,8 @@ class MainActivity : ComponentActivity() {
                             text = "Official Themes",
                             modifier = Modifier.padding(12.dp),
                             fontWeight = FontWeight.ExtraBold,
-                            fontSize = 24.sp
+                            fontSize = 24.sp,
+                            color = Color.White
                         )
 
                         DisplayEnvironments(environmentManager.getPackageListOfficial(), environmentManager)
@@ -175,7 +209,8 @@ class MainActivity : ComponentActivity() {
                             text = "Custom Themes",
                             modifier = Modifier.padding(12.dp),
                             fontWeight = FontWeight.ExtraBold,
-                            fontSize = 24.sp
+                            fontSize = 24.sp,
+                            color = Color.White
                         )
 
                         DisplayEnvironments(environmentManager.getPackageList(), environmentManager)

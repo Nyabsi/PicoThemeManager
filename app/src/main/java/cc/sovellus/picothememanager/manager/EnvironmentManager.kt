@@ -29,7 +29,7 @@ class EnvironmentManager(
 
     fun getPackageListOfficial(): List<PackageInfo> {
         return packageManager.getInstalledPackages(GET_SIGNING_CERTIFICATES).filter { packageInfo ->
-            packageInfo.signingInfo!!.apkContentsSigners!![0]!!.toByteArray().contentEquals(PICO_CERTIFICATE)
+            packageInfo.packageName.contains(Regex("com.pvr.[^.]+.scene")) && packageInfo.signingInfo!!.apkContentsSigners!![0]!!.toByteArray().contentEquals(PICO_CERTIFICATE)
         }
     }
 

@@ -6,7 +6,9 @@ import android.content.ContextWrapper
 import android.content.Intent
 import android.content.Intent.FLAG_ACTIVITY_CLEAR_TASK
 import android.content.pm.PackageInfo
+import android.os.Build
 import android.provider.Settings
+import java.util.Locale
 
 class EnvironmentManager(
     context: Context
@@ -46,11 +48,18 @@ class EnvironmentManager(
         Settings.Global.putString(contentResolver, "SceneManager.CurPackage", null)
         Settings.Global.putString(contentResolver, "SceneManager.CurrentScene", "")
         Settings.Global.putString(contentResolver, "current_scene", "default_scene")
+        Settings.Global.putInt(contentResolver, "current_support_skybox", 0)
     }
 
     fun setEnvironment(scenePackage: String, tag: String, scene: String) {
         Settings.Global.putString(contentResolver, "SceneManager.CurPackage", scenePackage)
         Settings.Global.putString(contentResolver, "SceneManager.CurrentScene", tag)
         Settings.Global.putString(contentResolver, "current_scene", scene)
+
+        if (tag.lowercase(Locale.ROOT) == "cyberroom" || tag.lowercase(Locale.ROOT) == "interstellar") {
+            Settings.Global.putInt(contentResolver, "current_support_skybox", 1)
+        } else {
+            Settings.Global.putInt(contentResolver, "current_support_skybox", 0)
+        }
     }
 }

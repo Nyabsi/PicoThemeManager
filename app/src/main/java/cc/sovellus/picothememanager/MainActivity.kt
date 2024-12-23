@@ -90,7 +90,11 @@ fun DisplayEnvironments(list: List<PackageInfo>, environmentManager: Environment
                             .height(180.dp)
                             .width(200.dp)
                             .clickable(onClick = {
-                                environmentManager.setEnvironment(it.packageName, sceneTag, "/assets/scene/$sceneTag/Scene_${sceneTag}_1_1.unity3d")
+                                environmentManager.setEnvironment(
+                                    it.packageName,
+                                    sceneTag,
+                                    "/assets/scene/$sceneTag/Scene_${sceneTag}_1_1.unity3d"
+                                )
                                 environmentManager.forceVrShellRestart()
                             })
                     ) {

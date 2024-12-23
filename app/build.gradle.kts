@@ -11,8 +11,8 @@ android {
         applicationId = "cc.sovellus.picothememanager"
         minSdk = 29
         targetSdk = 35
-        versionCode = 100105
-        versionName = "1.0.5"
+        versionCode = 100106
+        versionName = "1.0.6"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {

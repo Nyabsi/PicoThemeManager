@@ -2,9 +2,11 @@ package cc.sovellus.picothememanager
 
 import android.annotation.SuppressLint
 import android.content.pm.PackageInfo
+import android.content.pm.PackageManager
 import android.graphics.BitmapFactory
 import android.os.Bundle
 import android.util.Log
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -52,6 +54,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
+import androidx.core.app.ActivityCompat
 import cc.sovellus.picothememanager.manager.EnvironmentManager
 import cc.sovellus.picothememanager.ui.theme.ThemetoolTheme
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
@@ -102,12 +105,24 @@ fun DisplayEnvironments(list: List<PackageInfo>, environmentManager: Environment
                             .height(120.dp)
                             .width(200.dp)
                             .clickable(onClick = {
-                                environmentManager.setEnvironment(
-                                    it.packageName,
-                                    sceneTag,
-                                    "/assets/scene/$sceneTag/Scene_${sceneTag}_1_1.unity3d"
-                                )
-                                environmentManager.forceVrShellRestart()
+                                if (ActivityCompat.checkSelfPermission(
+                                        context,
+                                        "android.permission.WRITE_SECURE_SETTINGS"
+                                    ) == PackageManager.PERMISSION_GRANTED
+                                ) {
+                                    environmentManager.setEnvironment(
+                                        it.packageName,
+                                        sceneTag,
+                                        "/assets/scene/$sceneTag/Scene_${sceneTag}_1_1.unity3d"
+                                    )
+                                    environmentManager.forceVrShellRestart()
+                                } else {
+                                    Toast.makeText(
+                                        context,
+                                        "You need to grant android.permission.WRITE_SECURE_SETTINGS via ADB first!",
+                                        Toast.LENGTH_LONG
+                                    ).show()
+                                }
                             })
                             .hoverable(interactionSource),
                         contentAlignment = Alignment.TopStart
@@ -178,8 +193,20 @@ class MainActivity : ComponentActivity() {
                             containerColor = Color(0xff424242),
                             contentColor = Color(0xffffffff),
                             onClick = {
-                                environmentManager.resetEnvironment()
-                                environmentManager.forceVrShellRestart()
+                                if (ActivityCompat.checkSelfPermission(
+                                        this,
+                                        "android.permission.WRITE_SECURE_SETTINGS"
+                                    ) == PackageManager.PERMISSION_GRANTED
+                                ) {
+                                    environmentManager.resetEnvironment()
+                                    environmentManager.forceVrShellRestart()
+                                } else {
+                                    Toast.makeText(
+                                        this,
+                                        "You need to grant android.permission.WRITE_SECURE_SETTINGS via ADB first!",
+                                        Toast.LENGTH_LONG
+                                    ).show()
+                                }
                             },
                             icon = { Icon(Icons.Filled.Refresh, null) },
                             text = { Text(text = "Reset Environment") },

@@ -38,6 +38,7 @@ class EnvironmentManager(
         Settings.Global.putString(contentResolver, "SceneManager.CurrentScene", "")
         Settings.Global.putString(contentResolver, "current_scene", "default_scene")
         Settings.Global.putInt(contentResolver, "current_support_skybox", 0)
+        Settings.Global.putString(contentResolver, "current_scene_custom", null)
     }
 
     fun setEnvironment(scenePackage: String, tag: String, scene: String) {

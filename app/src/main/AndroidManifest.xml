@@ -3,6 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <uses-permission android:name="android.permission.WRITE_SECURE_SETTINGS" tools:ignore="ProtectedPermissions" />
+    <uses-permission android:name="android.permission.INSTALL_PACKAGES" tools:ignore="ProtectedPermissions" />
     <uses-permission android:name="android.permission.QUERY_ALL_PACKAGES" tools:ignore="QueryAllPackagesPermission" />
 
     <queries>
@@ -29,7 +30,11 @@
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+            <meta-data android:name="pico.vr.position" android:value="near"/>
         </activity>
+
+        <meta-data android:name="isPUI" android:value="1"/>
+        <meta-data android:name="pvr.vrshell.mode" android:value="1"/>
     </application>
 
 </manifest>

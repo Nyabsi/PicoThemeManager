@@ -41,13 +41,14 @@ class EnvironmentManager(
         Settings.Global.putString(contentResolver, "current_scene_custom", null)
     }
 
-    fun setEnvironment(scenePackage: String, tag: String, scene: String) {
+    fun setEnvironment(scenePackage: String, tag: String, scene: String, skybox: Boolean = false) {
         Settings.Global.putString(contentResolver, "SceneManager.CurPackage", scenePackage)
         Settings.Global.putString(contentResolver, "SceneManager.CurrentScene", tag)
         Settings.Global.putString(contentResolver, "current_scene", scene)
 
-        if (tag.lowercase(Locale.ROOT) == "cyberroom" || tag.lowercase(Locale.ROOT) == "interstellar") {
+        if (skybox) {
             Settings.Global.putInt(contentResolver, "current_support_skybox", 1)
+            Settings.Global.putString(contentResolver, "current_skybox", null)
         } else {
             Settings.Global.putInt(contentResolver, "current_support_skybox", 0)
         }

@@ -63,7 +63,7 @@ import com.bumptech.glide.integration.compose.GlideImage
 @OptIn(ExperimentalGlideComposeApi::class)
 @SuppressLint("DiscouragedApi")
 @Composable
-fun DisplayEnvironments(list: List<PackageInfo>, environmentManager: EnvironmentManager) {
+fun DisplayEnvironments(list: List<PackageInfo>, environmentManager: EnvironmentManager, official: Boolean = false) {
 
     val context = LocalContext.current
 
@@ -77,6 +77,85 @@ fun DisplayEnvironments(list: List<PackageInfo>, environmentManager: Environment
         ),
         modifier = Modifier.heightIn(max = 140.dp),
         content = {
+            if (official) {
+                val thumbnails = context.packageManager.getResourcesForApplication("com.pvr.scenemanager").assets.list("thumbs")!!
+                items(thumbnails.size) {
+                    val name = thumbnails[it]
+
+                    if (name != "default_scene" && name != "AIGC" && name != "Emulator" && name != "Default")
+                    {
+                        val assets = context.packageManager.getResourcesForApplication("com.pvr.scenemanager").assets
+
+                        val bitmap = remember { BitmapFactory.decodeStream(assets.open("thumbs/${name}/Scene_${name}_1_1.png")) }
+
+                        val interactionSource = remember { MutableInteractionSource() }
+                        val isHovered by interactionSource.collectIsHoveredAsState()
+
+                        val skyBoxes = assets.list("/assets/scene/$name/skybox/")
+
+                        assets.close()
+
+                        Box(
+                            modifier = Modifier
+                                .padding(4.dp)
+                                .fillMaxWidth()
+                                .height(120.dp)
+                                .width(200.dp)
+                                .clickable(onClick = {
+                                    if (ActivityCompat.checkSelfPermission(
+                                            context,
+                                            "android.permission.WRITE_SECURE_SETTINGS"
+                                        ) == PackageManager.PERMISSION_GRANTED
+                                    ) {
+                                        environmentManager.setEnvironment(
+                                            "com.pvr.scenemanager",
+                                            name,
+                                            "/assets/scene/$name/Scene_${name}_1_1.unity3d",
+                                            skyBoxes != null
+                                        )
+                                        environmentManager.forceVrShellRestart()
+                                    } else {
+                                        Toast
+                                            .makeText(
+                                                context,
+                                                "You need to grant android.permission.WRITE_SECURE_SETTINGS via ADB first!",
+                                                Toast.LENGTH_LONG
+                                            )
+                                            .show()
+                                    }
+                                })
+                                .hoverable(interactionSource),
+                            contentAlignment = Alignment.TopStart
+                        ) {
+                            GlideImage(
+                                model = bitmap,
+                                contentDescription = null,
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(120.dp)
+                                    .width(200.dp)
+                                    .zIndex(0f)
+                                    .clip(RoundedCornerShape(10)),
+                                contentScale = ContentScale.Crop,
+                                alpha = if (isHovered) { 0.4f } else { 1.0f },
+                            )
+                            if (isHovered) {
+                                Text(
+                                    text = name,
+                                    modifier = Modifier
+                                        .padding(4.dp)
+                                        .zIndex(1f),
+                                    textAlign = TextAlign.Start,
+                                    maxLines = 1,
+                                    overflow = TextOverflow.Ellipsis,
+                                    color = Color.White
+                                )
+                            }
+                        }
+                    }
+                    }
+            }
+
             items(list) {
                 val resources = context.packageManager.getResourcesForApplication(it.packageName)
                 val sceneTagId = resources.getIdentifier("sceneTag", "string", it.packageName)
@@ -93,10 +172,16 @@ fun DisplayEnvironments(list: List<PackageInfo>, environmentManager: Environment
                         Log.e("PicoThemeManager", "sceneNameId was 0 for ${it.packageName}")
                     }
 
-                    val bitmap = remember { BitmapFactory.decodeStream(context.packageManager.getResourcesForApplication(it.packageName).assets.open("thumbs/${sceneTag}/Scene_${sceneTag}_1_1.png")) }
+                    val assets = context.packageManager.getResourcesForApplication(it.packageName).assets
+
+                    val bitmap = remember { BitmapFactory.decodeStream(assets.open("thumbs/${sceneTag}/Scene_${sceneTag}_1_1.png")) }
 
                     val interactionSource = remember { MutableInteractionSource() }
                     val isHovered by interactionSource.collectIsHoveredAsState()
+
+                    val skyBoxes = assets.list("/assets/scene/$sceneTag/skybox/")
+
+                    assets.close()
 
                     Box(
                         modifier = Modifier
@@ -113,15 +198,18 @@ fun DisplayEnvironments(list: List<PackageInfo>, environmentManager: Environment
                                     environmentManager.setEnvironment(
                                         it.packageName,
                                         sceneTag,
-                                        "/assets/scene/$sceneTag/Scene_${sceneTag}_1_1.unity3d"
+                                        "/assets/scene/$sceneTag/Scene_${sceneTag}_1_1.unity3d",
+                                        skyBoxes != null
                                     )
                                     environmentManager.forceVrShellRestart()
                                 } else {
-                                    Toast.makeText(
-                                        context,
-                                        "You need to grant android.permission.WRITE_SECURE_SETTINGS via ADB first!",
-                                        Toast.LENGTH_LONG
-                                    ).show()
+                                    Toast
+                                        .makeText(
+                                            context,
+                                            "You need to grant android.permission.WRITE_SECURE_SETTINGS via ADB first!",
+                                            Toast.LENGTH_LONG
+                                        )
+                                        .show()
                                 }
                             })
                             .hoverable(interactionSource),
@@ -222,6 +310,7 @@ class MainActivity : ComponentActivity() {
                             .fillMaxSize()
                             .verticalScroll(rememberScroll)
                     ) {
+
                         Text(
                             text = "Official Themes",
                             modifier = Modifier.padding(12.dp),
@@ -230,7 +319,7 @@ class MainActivity : ComponentActivity() {
                             color = Color.White
                         )
 
-                        DisplayEnvironments(environmentManager.getPackageListOfficial(), environmentManager)
+                        DisplayEnvironments(environmentManager.getPackageListOfficial(), environmentManager, true)
 
                         Text(
                             text = "Custom Themes",

@@ -23,7 +23,7 @@ class EnvironmentManager(
 ) : ContextWrapper(context), CoroutineScope {
 
     override val coroutineContext = Dispatchers.Main + SupervisorJob()
-    private val isSparrow: Boolean = Build.MODEL.lowercase().contentEquals("sparrow")
+    private val isSparrow: Boolean = Build.HARDWARE.lowercase().contentEquals("sparrow")
 
     fun forceVrShellRestart() {
         val intent = Intent()

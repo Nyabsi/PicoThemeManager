@@ -22,11 +22,14 @@ adb shell pm grant cc.sovellus.picothememanager android.permission.WRITE_SECURE_
 
 ## Compatibility
 
-This software has been tested on Pico 4 Ultra and Pico 4
+compatibility with Pico OS 5.4.0 - 5.12.6 has been tested.
 
-Pico OS 5.11.2 - 5.12.6 has been confirmed to work, older devices should work.
-
-Pico OS 4.x compatibility has not been confirmed.
+### Tested Devices
+  - Pico 4 ✔️
+  - Pico 4 Pro ✔️
+  - Pico 4 Ultra ✔️
+  - Pico Neo 3 Link ✔️
+  - Pico 3 Pro ✔️
 
 ## Creating Custom Themes
 

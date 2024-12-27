@@ -5,6 +5,7 @@ import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
 import android.graphics.BitmapFactory
 import android.os.Bundle
+import android.provider.Settings
 import android.util.Log
 import android.widget.Toast
 import androidx.activity.ComponentActivity
@@ -40,6 +41,7 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -67,6 +69,8 @@ fun DisplayEnvironments(list: List<PackageInfo>, environmentManager: Environment
 
     val context = LocalContext.current
 
+    val lastClick = remember { mutableStateOf("") }
+
     LazyHorizontalGrid(
         rows = GridCells.Fixed(1),
         contentPadding = PaddingValues(
@@ -91,8 +95,6 @@ fun DisplayEnvironments(list: List<PackageInfo>, environmentManager: Environment
                         val interactionSource = remember { MutableInteractionSource() }
                         val isHovered by interactionSource.collectIsHoveredAsState()
 
-                        val skyBoxes = assets.list("/assets/scene/$name/skybox/")
-
                         assets.close()
 
                         Box(
@@ -107,13 +109,16 @@ fun DisplayEnvironments(list: List<PackageInfo>, environmentManager: Environment
                                             "android.permission.WRITE_SECURE_SETTINGS"
                                         ) == PackageManager.PERMISSION_GRANTED
                                     ) {
+                                        if (lastClick.value != name) {
+
+                                        }
                                         environmentManager.setEnvironment(
                                             "com.pvr.scenemanager",
                                             name,
-                                            "/assets/scene/$name/Scene_${name}_1_1.unity3d",
-                                            skyBoxes != null
+                                            "/assets/scene/$name/Scene_${name}_1_1.unity3d"
                                         )
                                         environmentManager.forceVrShellRestart()
+                                        lastClick.value = name
                                     } else {
                                         Toast
                                             .makeText(
@@ -179,8 +184,6 @@ fun DisplayEnvironments(list: List<PackageInfo>, environmentManager: Environment
                     val interactionSource = remember { MutableInteractionSource() }
                     val isHovered by interactionSource.collectIsHoveredAsState()
 
-                    val skyBoxes = assets.list("/assets/scene/$sceneTag/skybox/")
-
                     assets.close()
 
                     Box(
@@ -195,13 +198,15 @@ fun DisplayEnvironments(list: List<PackageInfo>, environmentManager: Environment
                                         "android.permission.WRITE_SECURE_SETTINGS"
                                     ) == PackageManager.PERMISSION_GRANTED
                                 ) {
-                                    environmentManager.setEnvironment(
-                                        it.packageName,
-                                        sceneTag,
-                                        "/assets/scene/$sceneTag/Scene_${sceneTag}_1_1.unity3d",
-                                        skyBoxes != null
-                                    )
-                                    environmentManager.forceVrShellRestart()
+                                    if (lastClick.value != sceneTag) {
+                                        environmentManager.setEnvironment(
+                                            it.packageName,
+                                            sceneTag,
+                                            "/assets/scene/$sceneTag/Scene_${sceneTag}_1_1.unity3d"
+                                        )
+                                        environmentManager.forceVrShellRestart()
+                                        lastClick.value = sceneTag
+                                    }
                                 } else {
                                     Toast
                                         .makeText(

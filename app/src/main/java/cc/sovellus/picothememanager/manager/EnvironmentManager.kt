@@ -7,7 +7,9 @@ import android.content.Intent
 import android.content.Intent.FLAG_ACTIVITY_CLEAR_TOP
 import android.content.pm.PackageInfo
 import android.content.pm.PackageManager.GET_SIGNING_CERTIFICATES
+import android.os.Build
 import android.provider.Settings
+import android.util.Config
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -25,10 +27,14 @@ class EnvironmentManager(
         intent.component = ComponentName("com.pvr.vrshell", "com.pvr.vrshell.MainActivity")
         intent.addFlags(FLAG_ACTIVITY_CLEAR_TOP)
 
-        launch {
-             startActivity(intent)
-             delay(1000)
-             startActivity(intent)
+        if (Build.MODEL.lowercase().contentEquals("sparrow")) {
+            launch {
+                startActivity(intent)
+                delay(1000)
+                startActivity(intent)
+            }
+        } else {
+            startActivity(intent)
         }
     }
 

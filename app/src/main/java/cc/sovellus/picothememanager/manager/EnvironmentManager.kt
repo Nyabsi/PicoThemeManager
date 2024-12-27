@@ -4,21 +4,32 @@ import android.content.ComponentName
 import android.content.Context
 import android.content.ContextWrapper
 import android.content.Intent
-import android.content.Intent.FLAG_ACTIVITY_CLEAR_TASK
+import android.content.Intent.FLAG_ACTIVITY_CLEAR_TOP
 import android.content.pm.PackageInfo
 import android.content.pm.PackageManager.GET_SIGNING_CERTIFICATES
 import android.provider.Settings
-import java.util.Locale
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 class EnvironmentManager(
     context: Context
-) : ContextWrapper(context) {
+) : ContextWrapper(context), CoroutineScope {
+
+    override val coroutineContext = Dispatchers.Main + SupervisorJob()
 
     fun forceVrShellRestart() {
         val intent = Intent()
         intent.component = ComponentName("com.pvr.vrshell", "com.pvr.vrshell.MainActivity")
-        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or FLAG_ACTIVITY_CLEAR_TASK)
-        startActivity(intent)
+        intent.addFlags(FLAG_ACTIVITY_CLEAR_TOP)
+
+        launch {
+             startActivity(intent)
+             delay(1000)
+             startActivity(intent)
+        }
     }
 
     fun getPackageList(): List<PackageInfo> {

@@ -4,7 +4,9 @@ import android.content.ComponentName
 import android.content.Context
 import android.content.ContextWrapper
 import android.content.Intent
+import android.content.Intent.FLAG_ACTIVITY_CLEAR_TASK
 import android.content.Intent.FLAG_ACTIVITY_CLEAR_TOP
+import android.content.Intent.FLAG_ACTIVITY_NEW_TASK
 import android.content.pm.PackageInfo
 import android.content.pm.PackageManager.GET_SIGNING_CERTIFICATES
 import android.os.Build
@@ -21,13 +23,14 @@ class EnvironmentManager(
 ) : ContextWrapper(context), CoroutineScope {
 
     override val coroutineContext = Dispatchers.Main + SupervisorJob()
+    private val isSparrow: Boolean = Build.MODEL.lowercase().contentEquals("sparrow")
 
     fun forceVrShellRestart() {
         val intent = Intent()
         intent.component = ComponentName("com.pvr.vrshell", "com.pvr.vrshell.MainActivity")
-        intent.addFlags(FLAG_ACTIVITY_CLEAR_TOP)
+        intent.addFlags(if (isSparrow) { FLAG_ACTIVITY_CLEAR_TOP } else { FLAG_ACTIVITY_NEW_TASK or FLAG_ACTIVITY_CLEAR_TASK })
 
-        if (Build.MODEL.lowercase().contentEquals("sparrow")) {
+        if (isSparrow) {
             launch {
                 startActivity(intent)
                 delay(1000)

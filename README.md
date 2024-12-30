@@ -4,7 +4,7 @@ Pico Theme Manager is a tool to help you easily switch between custom Pico OS th
 
 > This software is under development, the author is not responsible for any damage caused by the software.
 
-https://github.com/user-attachments/assets/8759a592-5ac8-46d3-ba21-b6c754c9aba2
+https://github.com/user-attachments/assets/222cc5fb-82ae-4bf7-9c99-302cb2249d69
 
 ## Installation
 
@@ -27,6 +27,7 @@ compatibility with Pico OS 5.2.7 - 5.12.6 has been tested.
 ### Tested Devices
   - Pico 4 ✔️
   - Pico 4 Pro ✔️
+  - Pico 4 Enterprise ✔️
   - Pico 4 Ultra ✔️
   - Pico Neo 3 Link ✔️
   - Pico 3 Pro ✔️

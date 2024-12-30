@@ -51,8 +51,6 @@ fun DisplayEnvironments(list: StateFlow<SnapshotStateList<PackageInfo>>, environ
 
     val context = LocalContext.current
 
-    val lastClick = remember { mutableStateOf("") }
-
     LazyHorizontalGrid(
         rows = GridCells.Fixed(1),
         contentPadding = PaddingValues(
@@ -97,15 +95,7 @@ fun DisplayEnvironments(list: StateFlow<SnapshotStateList<PackageInfo>>, environ
                                         context, Constants.ANDROID_PERMISSION_SECURE_SETTINGS
                                     ) == PackageManager.PERMISSION_GRANTED
                                 ) {
-                                    if (lastClick.value != sceneTag) {
-                                        Toast.makeText(
-                                            context,
-                                            context.getString(R.string.toast_scene_loading),
-                                            Toast.LENGTH_LONG
-                                        ).show()
-                                        environmentManager.applyEnvironment(it.packageName, sceneTag)
-                                        lastClick.value = sceneTag
-                                    }
+                                    environmentManager.applyEnvironment(it.packageName, sceneTag)
                                 } else {
                                     Toast
                                         .makeText(

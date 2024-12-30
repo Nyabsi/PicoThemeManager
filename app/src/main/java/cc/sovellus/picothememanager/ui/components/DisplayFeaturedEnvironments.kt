@@ -47,7 +47,6 @@ fun DisplayFeaturedEnvironments(environmentManager: EnvironmentManager) {
 
     val context = LocalContext.current
 
-    val lastClick = remember { mutableStateOf("") }
     val thumbnails = remember { context.packageManager.getResourcesForApplication(PICO_SCENE_MANAGER).assets.list("thumbs")!!  }
 
     LazyHorizontalGrid(
@@ -87,15 +86,7 @@ fun DisplayFeaturedEnvironments(environmentManager: EnvironmentManager) {
                                         "android.permission.WRITE_SECURE_SETTINGS"
                                     ) == PackageManager.PERMISSION_GRANTED
                                 ) {
-                                    if (lastClick.value != name) {
-                                        Toast.makeText(
-                                            context,
-                                            context.getString(R.string.toast_scene_loading),
-                                            Toast.LENGTH_LONG
-                                        ).show()
-                                        environmentManager.applyEnvironment(PICO_SCENE_MANAGER, name)
-                                        lastClick.value = name
-                                    }
+                                    environmentManager.applyEnvironment(PICO_SCENE_MANAGER, name)
                                 } else {
                                     Toast
                                         .makeText(

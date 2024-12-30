@@ -15,6 +15,8 @@ class EnvironmentManager(
     context: Context
 ) : ContextWrapper(context) {
 
+    var previousSelection: String = ""
+
     fun getPackageList(): SnapshotStateList<PackageInfo> {
         return packageManager.getInstalledPackages(GET_SIGNING_CERTIFICATES).filter { packageInfo ->
             packageInfo.packageName.contains(Regex("com.pvr.[^.]+.scene")) && !packageInfo.signingInfo!!.apkContentsSigners!![0]!!.toByteArray().contentEquals(PICO_CERTIFICATE)
@@ -37,10 +39,13 @@ class EnvironmentManager(
     }
 
     fun applyEnvironment(pkg: String, tag: String) {
-        Settings.Global.putString(contentResolver, "SceneManager.CurPackage", pkg)
-        Settings.Global.putString(contentResolver, "SceneManager.CurrentScene", tag)
-        Settings.Global.putString(contentResolver, "current_scene", "/assets/scene/$tag/Scene_${tag}_1_1.unity3d")
-        Settings.Global.putString(contentResolver, "scene_change_type", "${System.currentTimeMillis()}1")
+        if (previousSelection != tag) {
+            Settings.Global.putString(contentResolver, "SceneManager.CurPackage", pkg)
+            Settings.Global.putString(contentResolver, "SceneManager.CurrentScene", tag)
+            Settings.Global.putString(contentResolver, "current_scene", "/assets/scene/$tag/Scene_${tag}_1_1.unity3d")
+            Settings.Global.putString(contentResolver, "scene_change_type", "${System.currentTimeMillis()}1")
+            previousSelection = tag
+        }
     }
 
     companion object {

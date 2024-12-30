@@ -1,22 +1,15 @@
 package cc.sovellus.picothememanager.manager
 
-import android.content.ComponentName
 import android.content.Context
 import android.content.ContextWrapper
-import android.content.Intent
-import android.content.Intent.FLAG_ACTIVITY_CLEAR_TASK
-import android.content.Intent.FLAG_ACTIVITY_CLEAR_TOP
-import android.content.Intent.FLAG_ACTIVITY_NEW_TASK
 import android.content.pm.PackageInfo
 import android.content.pm.PackageManager.GET_SIGNING_CERTIFICATES
-import android.os.Build
 import android.provider.Settings
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.runtime.toMutableStateList
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 
@@ -25,15 +18,6 @@ class EnvironmentManager(
 ) : ContextWrapper(context), CoroutineScope {
 
     override val coroutineContext = Dispatchers.Main + SupervisorJob()
-    private val isSparrow: Boolean = Build.HARDWARE.lowercase().contentEquals("sparrow")
-
-    private fun restartVRShell() {
-        val intent = Intent()
-        intent.component = ComponentName("com.pvr.vrshell", "com.pvr.vrshell.MainActivity")
-        intent.addFlags(if (isSparrow) { FLAG_ACTIVITY_CLEAR_TOP } else { FLAG_ACTIVITY_NEW_TASK or FLAG_ACTIVITY_CLEAR_TASK })
-
-        startActivity(intent)
-    }
 
     fun getPackageList(): SnapshotStateList<PackageInfo> {
         return packageManager.getInstalledPackages(GET_SIGNING_CERTIFICATES).filter { packageInfo ->
@@ -54,9 +38,7 @@ class EnvironmentManager(
             Settings.Global.putString(contentResolver, "current_scene", "default_scene")
             Settings.Global.putInt(contentResolver, "current_support_skybox", 0)
             Settings.Global.putString(contentResolver, "current_scene_custom", null)
-
-            delay(3000)
-            restartVRShell()
+            Settings.Global.putString(contentResolver, "scene_change_type", "${System.currentTimeMillis()}1")
         }
     }
 
@@ -65,9 +47,7 @@ class EnvironmentManager(
             Settings.Global.putString(contentResolver, "SceneManager.CurPackage", pkg)
             Settings.Global.putString(contentResolver, "SceneManager.CurrentScene", tag)
             Settings.Global.putString(contentResolver, "current_scene", "/assets/scene/$tag/Scene_${tag}_1_1.unity3d")
-
-            delay(3000)
-            restartVRShell()
+            Settings.Global.putString(contentResolver, "scene_change_type", "${System.currentTimeMillis()}1")
         }
     }
 

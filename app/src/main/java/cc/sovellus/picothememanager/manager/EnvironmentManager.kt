@@ -10,14 +10,10 @@ import androidx.compose.runtime.toMutableStateList
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.launch
-
 
 class EnvironmentManager(
     context: Context
-) : ContextWrapper(context), CoroutineScope {
-
-    override val coroutineContext = Dispatchers.Main + SupervisorJob()
+) : ContextWrapper(context) {
 
     fun getPackageList(): SnapshotStateList<PackageInfo> {
         return packageManager.getInstalledPackages(GET_SIGNING_CERTIFICATES).filter { packageInfo ->
@@ -32,23 +28,19 @@ class EnvironmentManager(
     }
 
     fun resetEnvironment() {
-        launch {
-            Settings.Global.putString(contentResolver, "SceneManager.CurPackage", null)
-            Settings.Global.putString(contentResolver, "SceneManager.CurrentScene", "")
-            Settings.Global.putString(contentResolver, "current_scene", "default_scene")
-            Settings.Global.putInt(contentResolver, "current_support_skybox", 0)
-            Settings.Global.putString(contentResolver, "current_scene_custom", null)
-            Settings.Global.putString(contentResolver, "scene_change_type", "${System.currentTimeMillis()}1")
-        }
+        Settings.Global.putString(contentResolver, "SceneManager.CurPackage", null)
+        Settings.Global.putString(contentResolver, "SceneManager.CurrentScene", "")
+        Settings.Global.putString(contentResolver, "current_scene", "default_scene")
+        Settings.Global.putInt(contentResolver, "current_support_skybox", 0)
+        Settings.Global.putString(contentResolver, "current_scene_custom", null)
+        Settings.Global.putString(contentResolver, "scene_change_type", "${System.currentTimeMillis()}1")
     }
 
     fun applyEnvironment(pkg: String, tag: String) {
-        launch {
-            Settings.Global.putString(contentResolver, "SceneManager.CurPackage", pkg)
-            Settings.Global.putString(contentResolver, "SceneManager.CurrentScene", tag)
-            Settings.Global.putString(contentResolver, "current_scene", "/assets/scene/$tag/Scene_${tag}_1_1.unity3d")
-            Settings.Global.putString(contentResolver, "scene_change_type", "${System.currentTimeMillis()}1")
-        }
+        Settings.Global.putString(contentResolver, "SceneManager.CurPackage", pkg)
+        Settings.Global.putString(contentResolver, "SceneManager.CurrentScene", tag)
+        Settings.Global.putString(contentResolver, "current_scene", "/assets/scene/$tag/Scene_${tag}_1_1.unity3d")
+        Settings.Global.putString(contentResolver, "scene_change_type", "${System.currentTimeMillis()}1")
     }
 
     companion object {

@@ -11,12 +11,14 @@ import android.content.pm.PackageInfo
 import android.content.pm.PackageManager.GET_SIGNING_CERTIFICATES
 import android.os.Build
 import android.provider.Settings
-import android.util.Config
+import androidx.compose.runtime.snapshots.SnapshotStateList
+import androidx.compose.runtime.toMutableStateList
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+
 
 class EnvironmentManager(
     context: Context
@@ -25,46 +27,48 @@ class EnvironmentManager(
     override val coroutineContext = Dispatchers.Main + SupervisorJob()
     private val isSparrow: Boolean = Build.HARDWARE.lowercase().contentEquals("sparrow")
 
-    fun forceVrShellRestart() {
+    private fun restartVRShell() {
         val intent = Intent()
         intent.component = ComponentName("com.pvr.vrshell", "com.pvr.vrshell.MainActivity")
         intent.addFlags(if (isSparrow) { FLAG_ACTIVITY_CLEAR_TOP } else { FLAG_ACTIVITY_NEW_TASK or FLAG_ACTIVITY_CLEAR_TASK })
 
-        if (isSparrow) {
-            launch {
-                startActivity(intent)
-                delay(1000)
-                startActivity(intent)
-            }
-        } else {
-            startActivity(intent)
-        }
+        startActivity(intent)
     }
 
-    fun getPackageList(): List<PackageInfo> {
+    fun getPackageList(): SnapshotStateList<PackageInfo> {
         return packageManager.getInstalledPackages(GET_SIGNING_CERTIFICATES).filter { packageInfo ->
             packageInfo.packageName.contains(Regex("com.pvr.[^.]+.scene")) && !packageInfo.signingInfo!!.apkContentsSigners!![0]!!.toByteArray().contentEquals(PICO_CERTIFICATE)
-        }
+        }.toMutableStateList()
     }
 
-    fun getPackageListOfficial(): List<PackageInfo> {
+    fun getSystemPackageList(): SnapshotStateList<PackageInfo> {
         return packageManager.getInstalledPackages(GET_SIGNING_CERTIFICATES).filter { packageInfo ->
             packageInfo.packageName.contains(Regex("com.pvr.[^.]+.scene")) && packageInfo.signingInfo!!.apkContentsSigners!![0]!!.toByteArray().contentEquals(PICO_CERTIFICATE)
-        }
+        }.toMutableStateList()
     }
 
     fun resetEnvironment() {
-        Settings.Global.putString(contentResolver, "SceneManager.CurPackage", null)
-        Settings.Global.putString(contentResolver, "SceneManager.CurrentScene", "")
-        Settings.Global.putString(contentResolver, "current_scene", "default_scene")
-        Settings.Global.putInt(contentResolver, "current_support_skybox", 0)
-        Settings.Global.putString(contentResolver, "current_scene_custom", null)
+        launch {
+            Settings.Global.putString(contentResolver, "SceneManager.CurPackage", null)
+            Settings.Global.putString(contentResolver, "SceneManager.CurrentScene", "")
+            Settings.Global.putString(contentResolver, "current_scene", "default_scene")
+            Settings.Global.putInt(contentResolver, "current_support_skybox", 0)
+            Settings.Global.putString(contentResolver, "current_scene_custom", null)
+
+            delay(3000)
+            restartVRShell()
+        }
     }
 
-    fun setEnvironment(scenePackage: String, tag: String, scene: String) {
-        Settings.Global.putString(contentResolver, "SceneManager.CurPackage", scenePackage)
-        Settings.Global.putString(contentResolver, "SceneManager.CurrentScene", tag)
-        Settings.Global.putString(contentResolver, "current_scene", scene)
+    fun applyEnvironment(pkg: String, tag: String) {
+        launch {
+            Settings.Global.putString(contentResolver, "SceneManager.CurPackage", pkg)
+            Settings.Global.putString(contentResolver, "SceneManager.CurrentScene", tag)
+            Settings.Global.putString(contentResolver, "current_scene", "/assets/scene/$tag/Scene_${tag}_1_1.unity3d")
+
+            delay(3000)
+            restartVRShell()
+        }
     }
 
     companion object {

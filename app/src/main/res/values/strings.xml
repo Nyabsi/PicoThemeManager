@@ -1,3 +1,10 @@
 <resources>
     <string name="app_name">Pico Theme Manager</string>
+    <string name="label_featured">Featured</string>
+    <string name="label_more">More</string>
+    <string name="label_custom">Custom</string>
+    <string name="toast_no_permission">You need to grant android.permission.WRITE_SECURE_SETTINGS via ADB first!</string>
+    <string name="toast_scene_loading">Scene is loading…</string>
+    <string name="toast_refresh_environments">Environments reloaded!</string>
+    <string name="button_reset_environment">Reset Environment</string>
 </resources>

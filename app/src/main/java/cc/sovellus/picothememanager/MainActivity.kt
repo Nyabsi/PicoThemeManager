@@ -100,11 +100,6 @@ class MainActivity : ComponentActivity() {
                                         this, Constants.ANDROID_PERMISSION_SECURE_SETTINGS
                                     ) == PackageManager.PERMISSION_GRANTED
                                 ) {
-                                    Toast.makeText(
-                                        this,
-                                        this.getString(R.string.toast_scene_loading),
-                                        Toast.LENGTH_LONG
-                                    ).show()
                                     environmentManager.resetEnvironment()
                                 } else {
                                     Toast.makeText(

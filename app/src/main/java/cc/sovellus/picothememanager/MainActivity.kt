@@ -71,7 +71,8 @@ class MainActivity : ComponentActivity() {
                                 Text(
                                     text = stringResource(id = R.string.app_name),
                                     maxLines = 1,
-                                    overflow = TextOverflow.Ellipsis
+                                    overflow = TextOverflow.Ellipsis,
+                                    color = Color.White
                                 )
                             },
                             colors = TopAppBarDefaults.topAppBarColors().copy(containerColor = Color(0xff292929)),
@@ -85,7 +86,7 @@ class MainActivity : ComponentActivity() {
                                         context.getString(R.string.toast_refresh_environments),
                                         Toast.LENGTH_SHORT
                                     ).show()
-                                }))
+                                }), tint = Color.White)
                             }
                         )
                     },

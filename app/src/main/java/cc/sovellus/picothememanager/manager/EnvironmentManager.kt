@@ -7,9 +7,6 @@ import android.content.pm.PackageManager.GET_SIGNING_CERTIFICATES
 import android.provider.Settings
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.runtime.toMutableStateList
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.SupervisorJob
 
 class EnvironmentManager(
     context: Context

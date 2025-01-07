@@ -7,11 +7,13 @@ import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Clear
@@ -24,7 +26,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.mutableStateListOf
-import androidx.compose.runtime.toMutableStateList
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
@@ -75,7 +76,7 @@ class MainActivity : ComponentActivity() {
                                     color = Color.White
                                 )
                             },
-                            colors = TopAppBarDefaults.topAppBarColors().copy(containerColor = Color(0xff292929)),
+                            colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Transparent),
                             actions = {
                                 Icon(Icons.Filled.Refresh, contentDescription = null, modifier = Modifier.padding(16.dp).clickable(onClick = {
                                     systemPackageStateFlow.value = environmentManager.getSystemPackageList()
@@ -90,7 +91,7 @@ class MainActivity : ComponentActivity() {
                             }
                         )
                     },
-                    containerColor = Color(0xff292929),
+                    containerColor = Color.Transparent,
                     floatingActionButton = {
                         ExtendedFloatingActionButton(
                             containerColor = Color(0xff424242),
@@ -113,7 +114,7 @@ class MainActivity : ComponentActivity() {
                             text = { Text(text = this.getString(R.string.button_reset_environment)) },
                         )
                     },
-                    modifier = Modifier.fillMaxSize()) { innerPadding ->
+                    modifier = Modifier.fillMaxSize().background(color = Color(0xff292929), shape = RoundedCornerShape(32.dp))) { innerPadding ->
                     Column(
                         modifier = Modifier
                             .padding(

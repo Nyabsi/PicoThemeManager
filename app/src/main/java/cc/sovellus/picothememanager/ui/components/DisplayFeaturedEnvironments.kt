@@ -80,6 +80,7 @@ fun DisplayFeaturedEnvironments(environmentManager: EnvironmentManager) {
                             .fillMaxWidth()
                             .height(120.dp)
                             .width(200.dp)
+                            .clip(RoundedCornerShape(10))
                             .clickable(onClick = {
                                 if (ActivityCompat.checkSelfPermission(
                                         context,
@@ -107,8 +108,7 @@ fun DisplayFeaturedEnvironments(environmentManager: EnvironmentManager) {
                                 .fillMaxWidth()
                                 .height(120.dp)
                                 .width(200.dp)
-                                .zIndex(0f)
-                                .clip(RoundedCornerShape(10)),
+                                .zIndex(0f),
                             contentScale = ContentScale.Crop,
                             alpha = if (isHovered) { 0.4f } else { 1.0f },
                         )

@@ -2,19 +2,21 @@
 
 Pico Theme Manager is a tool to help you easily switch between custom Pico OS themes on your Pico device.
 
+> [!WARNING]
 > This software is under development, the author is not responsible for any damage caused by the software.
 
 https://github.com/user-attachments/assets/222cc5fb-82ae-4bf7-9c99-302cb2249d69
 
 ## Installation
 
-You can download latest version of the apk from [here](https://github.com/Nyabsi/PicoThemeManager/releases) you will need adb to complete the installation
+You can download latest version of the apk from [here](https://github.com/Nyabsi/PicoThemeManager/releases). 
 
-> ⚠️ PicoThemeManager requires permission "android.permission.WRITE_SECURE_SETTINGS" ⚠️
+You will need Android Debug Bridge to complete the installation.
 
-you need adb and Developer Mode enabled to grant permissions to Pico Theme Manager.
+> [!IMPORTANT]
+> PicoThemeManager requires permission `android.permission.WRITE_SECURE_SETTINGS` to be granted.
 
-Grant "android.permission.WRITE_SECURE_SETTINGS" to PicoThemeManager:
+Grant `android.permission.WRITE_SECURE_SETTINGS` to PicoThemeManager with Android Debug Bridge:
 
 ```
 adb shell pm grant cc.sovellus.picothememanager android.permission.WRITE_SECURE_SETTINGS
@@ -22,9 +24,10 @@ adb shell pm grant cc.sovellus.picothememanager android.permission.WRITE_SECURE_
 
 ## Compatibility
 
-compatibility with Pico OS 5.2.7 - 5.12.6 has been tested.
+Compatibility with Pico OS 5.2.7 - 5.12.6 has been tested.
 
 ### Tested Devices
+
   - Pico 4 ✔️
   - Pico 4 Pro ✔️
   - Pico 4 Enterprise ✔️
@@ -34,7 +37,7 @@ compatibility with Pico OS 5.2.7 - 5.12.6 has been tested.
 
 ## Creating Custom Themes
 
-You can find guide for making your own custom themes [here](https://gist.github.com/Nyabsi/c14bd38d03d6dc44721779c182762627)
+You can find guide for making your own custom themes [here](https://gist.github.com/Nyabsi/c14bd38d03d6dc44721779c182762627).
 
 ## Contributing
 
@@ -42,4 +45,4 @@ Feel free to contribute through Pull Request, if you think this project needs so
 
 ## License
 
-This project is licensed under MIT which can be found in `LICENSE` file in the root folder
+This project is licensed under MIT which can be found in `LICENSE` file in the root folder.

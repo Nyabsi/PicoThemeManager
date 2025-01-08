@@ -144,10 +144,7 @@ fun ThemeComponent(
                         }) {
                         Icon(
                             imageVector = Icons.Filled.Delete,
-                            contentDescription = stringResource(
-                                R.string.delete_environment,
-                                sceneName
-                            ),
+                            contentDescription = null,
                             tint = Color.White,
                             modifier = Modifier
                                 .width(24.dp)

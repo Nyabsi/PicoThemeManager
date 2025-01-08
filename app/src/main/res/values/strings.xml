@@ -6,5 +6,4 @@
     <string name="toast_no_permission">You need to grant android.permission.WRITE_SECURE_SETTINGS via ADB first!</string>
     <string name="toast_refresh_environments">Environments reloaded!</string>
     <string name="button_reset_environment">Reset Environment</string>
-    <string name="delete_environment">Delete environment %1$s</string>
 </resources>

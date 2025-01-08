@@ -25,6 +25,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -40,7 +41,6 @@ import cc.sovellus.picothememanager.ui.components.DisplayEnvironments
 import cc.sovellus.picothememanager.ui.components.DisplayFeaturedEnvironments
 import cc.sovellus.picothememanager.ui.theme.ThemetoolTheme
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
 
 
 class MainActivity : ComponentActivity() {
@@ -48,10 +48,13 @@ class MainActivity : ComponentActivity() {
     private lateinit var environmentManager: EnvironmentManager
 
     private var systemPackageStateFlow = MutableStateFlow(mutableStateListOf<PackageInfo>())
-    private var systemPackages = systemPackageStateFlow.asStateFlow()
-
     private var customPackageStateFlow = MutableStateFlow(mutableStateListOf<PackageInfo>())
-    private var customPackages = customPackageStateFlow.asStateFlow()
+
+    override fun onResume() {
+        super.onResume()
+        systemPackageStateFlow.value = environmentManager.getSystemPackageList()
+        customPackageStateFlow.value = environmentManager.getPackageList()
+    }
 
     @OptIn(ExperimentalMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -64,6 +67,8 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             ThemetoolTheme {
+                val systemPackages = systemPackageStateFlow.collectAsState()
+                val customPackages = customPackageStateFlow.collectAsState()
                 val context = LocalContext.current
                 Scaffold(
                     topBar = {
@@ -135,23 +140,27 @@ class MainActivity : ComponentActivity() {
 
                         DisplayFeaturedEnvironments(environmentManager)
 
-                        Text(
-                            text = stringResource(R.string.label_more),
-                            modifier = Modifier.padding(start = 32.dp, end = 32.dp),
-                            fontWeight = FontWeight.Medium,
-                            fontSize = 16.sp,
-                            color = Color.Gray
-                        )
+                        if (!systemPackages.value.isEmpty()) {
+                            Text(
+                                text = stringResource(R.string.label_more),
+                                modifier = Modifier.padding(start = 32.dp, end = 32.dp),
+                                fontWeight = FontWeight.Medium,
+                                fontSize = 16.sp,
+                                color = Color.Gray
+                            )
+                        }
 
                         DisplayEnvironments(systemPackages, environmentManager)
 
-                        Text(
-                            text = stringResource(R.string.label_custom),
-                            modifier = Modifier.padding(start = 32.dp, end = 32.dp),
-                            fontWeight = FontWeight.Medium,
-                            fontSize = 16.sp,
-                            color = Color.Gray
-                        )
+                        if (!customPackages.value.isEmpty()) {
+                            Text(
+                                text = stringResource(R.string.label_custom),
+                                modifier = Modifier.padding(start = 32.dp, end = 32.dp),
+                                fontWeight = FontWeight.Medium,
+                                fontSize = 16.sp,
+                                color = Color.Gray
+                            )
+                        }
 
                         DisplayEnvironments(customPackages, environmentManager)
                     }

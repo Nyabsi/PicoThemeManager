@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Pico Theme Manager</string>
+    <string name="label_featured">Избранное</string>
+    <string name="label_more">Больше</string>
+    <string name="label_custom">Пользовательские</string>
+    <string name="toast_no_permission">Вам необходимо предоставить разрешение android.permission.WRITE_SECURE_SETTINGS через ADB!</string>
+    <string name="toast_refresh_environments">Окружения обновлены!</string>
+    <string name="button_reset_environment">Сбросить окружение</string>
+    <string name="delete_environment">Удалить окружение %1$s</string>
+</resources>

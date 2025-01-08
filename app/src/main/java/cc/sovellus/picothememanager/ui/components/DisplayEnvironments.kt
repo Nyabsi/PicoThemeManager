@@ -174,7 +174,7 @@ fun DisplayEnvironments(list: StateFlow<SnapshotStateList<PackageInfo>>, environ
                                     }) {
                                     Icon(
                                         imageVector = Icons.Filled.Delete,
-                                        contentDescription = stringResource(R.string.delete_theme, sceneName),
+                                        contentDescription = stringResource(R.string.delete_environment, sceneName),
                                         tint = Color.White,
                                         modifier = Modifier
                                             .width(24.dp)

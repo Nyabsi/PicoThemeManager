@@ -7,11 +7,13 @@ import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Clear
@@ -23,8 +25,8 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateListOf
-import androidx.compose.runtime.toMutableStateList
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
@@ -39,7 +41,6 @@ import cc.sovellus.picothememanager.ui.components.DisplayEnvironments
 import cc.sovellus.picothememanager.ui.components.DisplayFeaturedEnvironments
 import cc.sovellus.picothememanager.ui.theme.ThemetoolTheme
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
 
 
 class MainActivity : ComponentActivity() {
@@ -47,10 +48,13 @@ class MainActivity : ComponentActivity() {
     private lateinit var environmentManager: EnvironmentManager
 
     private var systemPackageStateFlow = MutableStateFlow(mutableStateListOf<PackageInfo>())
-    private var systemPackages = systemPackageStateFlow.asStateFlow()
-
     private var customPackageStateFlow = MutableStateFlow(mutableStateListOf<PackageInfo>())
-    private var customPackages = customPackageStateFlow.asStateFlow()
+
+    override fun onResume() {
+        super.onResume()
+        systemPackageStateFlow.value = environmentManager.getSystemPackageList()
+        customPackageStateFlow.value = environmentManager.getPackageList()
+    }
 
     @OptIn(ExperimentalMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -63,6 +67,8 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             ThemetoolTheme {
+                val systemPackages = systemPackageStateFlow.collectAsState()
+                val customPackages = customPackageStateFlow.collectAsState()
                 val context = LocalContext.current
                 Scaffold(
                     topBar = {
@@ -75,7 +81,7 @@ class MainActivity : ComponentActivity() {
                                     color = Color.White
                                 )
                             },
-                            colors = TopAppBarDefaults.topAppBarColors().copy(containerColor = Color(0xff292929)),
+                            colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Transparent),
                             actions = {
                                 Icon(Icons.Filled.Refresh, contentDescription = null, modifier = Modifier.padding(16.dp).clickable(onClick = {
                                     systemPackageStateFlow.value = environmentManager.getSystemPackageList()
@@ -90,7 +96,7 @@ class MainActivity : ComponentActivity() {
                             }
                         )
                     },
-                    containerColor = Color(0xff292929),
+                    containerColor = Color.Transparent,
                     floatingActionButton = {
                         ExtendedFloatingActionButton(
                             containerColor = Color(0xff424242),
@@ -113,7 +119,7 @@ class MainActivity : ComponentActivity() {
                             text = { Text(text = this.getString(R.string.button_reset_environment)) },
                         )
                     },
-                    modifier = Modifier.fillMaxSize()) { innerPadding ->
+                    modifier = Modifier.fillMaxSize().background(color = Color(0xff292929), shape = RoundedCornerShape(32.dp))) { innerPadding ->
                     Column(
                         modifier = Modifier
                             .padding(
@@ -134,23 +140,27 @@ class MainActivity : ComponentActivity() {
 
                         DisplayFeaturedEnvironments(environmentManager)
 
-                        Text(
-                            text = stringResource(R.string.label_more),
-                            modifier = Modifier.padding(start = 32.dp, end = 32.dp),
-                            fontWeight = FontWeight.Medium,
-                            fontSize = 16.sp,
-                            color = Color.Gray
-                        )
+                        if (!systemPackages.value.isEmpty()) {
+                            Text(
+                                text = stringResource(R.string.label_more),
+                                modifier = Modifier.padding(start = 32.dp, end = 32.dp),
+                                fontWeight = FontWeight.Medium,
+                                fontSize = 16.sp,
+                                color = Color.Gray
+                            )
+                        }
 
                         DisplayEnvironments(systemPackages, environmentManager)
 
-                        Text(
-                            text = stringResource(R.string.label_custom),
-                            modifier = Modifier.padding(start = 32.dp, end = 32.dp),
-                            fontWeight = FontWeight.Medium,
-                            fontSize = 16.sp,
-                            color = Color.Gray
-                        )
+                        if (!customPackages.value.isEmpty()) {
+                            Text(
+                                text = stringResource(R.string.label_custom),
+                                modifier = Modifier.padding(start = 32.dp, end = 32.dp),
+                                fontWeight = FontWeight.Medium,
+                                fontSize = 16.sp,
+                                color = Color.Gray
+                            )
+                        }
 
                         DisplayEnvironments(customPackages, environmentManager)
                     }

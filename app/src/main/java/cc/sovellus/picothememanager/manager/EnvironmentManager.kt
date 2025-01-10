@@ -12,7 +12,7 @@ class EnvironmentManager(
     context: Context
 ) : ContextWrapper(context) {
 
-    var previousSelection: String = ""
+    private var previousSelection: String = ""
 
     fun getPackageList(): SnapshotStateList<PackageInfo> {
         return packageManager.getInstalledPackages(GET_SIGNING_CERTIFICATES).filter { packageInfo ->
@@ -33,6 +33,7 @@ class EnvironmentManager(
         Settings.Global.putInt(contentResolver, "current_support_skybox", 0)
         Settings.Global.putString(contentResolver, "current_scene_custom", null)
         Settings.Global.putString(contentResolver, "scene_change_type", "${System.currentTimeMillis()}1")
+        previousSelection = ""
     }
 
     fun applyEnvironment(pkg: String, tag: String) {

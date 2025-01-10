@@ -8,7 +8,6 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -21,6 +20,7 @@ import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -42,18 +42,21 @@ import cc.sovellus.picothememanager.ui.components.DisplayFeaturedEnvironments
 import cc.sovellus.picothememanager.ui.theme.ThemetoolTheme
 import kotlinx.coroutines.flow.MutableStateFlow
 
-
 class MainActivity : ComponentActivity() {
 
     private lateinit var environmentManager: EnvironmentManager
-
     private var systemPackageStateFlow = MutableStateFlow(mutableStateListOf<PackageInfo>())
     private var customPackageStateFlow = MutableStateFlow(mutableStateListOf<PackageInfo>())
 
-    override fun onResume() {
-        super.onResume()
+    private fun updateThemes() {
         systemPackageStateFlow.value = environmentManager.getSystemPackageList()
         customPackageStateFlow.value = environmentManager.getPackageList()
+        environmentManager.clearThumbnailCache()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        updateThemes()
     }
 
     @OptIn(ExperimentalMaterial3Api::class)
@@ -62,8 +65,8 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
 
         environmentManager = EnvironmentManager(this)
-        systemPackageStateFlow.value = environmentManager.getSystemPackageList()
-        customPackageStateFlow.value = environmentManager.getPackageList()
+
+        updateThemes()
 
         setContent {
             ThemetoolTheme {
@@ -83,16 +86,17 @@ class MainActivity : ComponentActivity() {
                             },
                             colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Transparent),
                             actions = {
-                                Icon(Icons.Filled.Refresh, contentDescription = null, modifier = Modifier.padding(16.dp).clickable(onClick = {
-                                    systemPackageStateFlow.value = environmentManager.getSystemPackageList()
-                                    customPackageStateFlow.value = environmentManager.getPackageList()
+                                IconButton(onClick = {
+                                    updateThemes()
 
                                     Toast.makeText(
                                         context,
                                         context.getString(R.string.toast_refresh_environments),
                                         Toast.LENGTH_SHORT
                                     ).show()
-                                }), tint = Color.White)
+                                }) {
+                                    Icon(Icons.Filled.Refresh, contentDescription = null, tint = Color.White)
+                                }
                             }
                         )
                     },

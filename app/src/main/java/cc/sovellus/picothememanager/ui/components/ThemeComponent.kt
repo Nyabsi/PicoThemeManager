@@ -3,8 +3,6 @@ package cc.sovellus.picothememanager.ui.components
 import android.content.ComponentName
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.graphics.BitmapFactory
-import android.os.Build
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
@@ -27,14 +25,13 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -54,13 +51,14 @@ fun ThemeComponent(
     sceneName: String
 ) {
     val context = LocalContext.current
-    val assets = context.packageManager.getResourcesForApplication(packageName).assets
-    val bitmap = remember(sceneTag) { BitmapFactory.decodeStream(assets.open("thumbs/${sceneTag}/Scene_${sceneTag}_1_1.png")) }
-
+    val bitmapRoutine = rememberCoroutineScope()
+    val bitmap = remember(sceneTag) {
+        bitmapRoutine.run {
+            environmentManager.getThumbnail(packageName, sceneTag)
+        }
+    }
     val interactionSource = remember { MutableInteractionSource() }
     val isHovered by interactionSource.collectIsHoveredAsState()
-
-    assets.close()
 
     Box(
         modifier = Modifier
@@ -89,7 +87,7 @@ fun ThemeComponent(
         contentAlignment = Alignment.TopStart
     ) {
         Image(
-            bitmap = bitmap.asImageBitmap(),
+            bitmap = bitmap,
             contentDescription = null,
             modifier = Modifier
                 .fillMaxWidth()

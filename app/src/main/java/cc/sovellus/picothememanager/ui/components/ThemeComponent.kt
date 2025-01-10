@@ -4,6 +4,7 @@ import android.content.ComponentName
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.BitmapFactory
+import android.os.Build
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
@@ -128,7 +129,7 @@ fun ThemeComponent(
                                 setComponent(
                                     ComponentName(
                                         "com.android.permissioncontroller",
-                                        "com.android.packageinstaller.permission.ui.pico.AppPermissionsActivity"
+                                        if (Build.HARDWARE.lowercase().contentEquals("sparrow")) { "com.android.permissioncontroller.permission.ui.pico.AppPermissionsActivity" } else { "com.android.packageinstaller.permission.ui.pico.AppPermissionsActivity" }
                                     )
                                 )
                                 putExtra(

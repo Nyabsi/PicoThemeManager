@@ -44,6 +44,7 @@ import cc.sovellus.picothememanager.Constants
 import cc.sovellus.picothememanager.Constants.PICO_SCENE_MANAGER
 import cc.sovellus.picothememanager.R
 import cc.sovellus.picothememanager.manager.EnvironmentManager
+import cc.sovellus.picothememanager.utils.getSystemProperty
 
 @Composable
 fun ThemeComponent(
@@ -129,7 +130,7 @@ fun ThemeComponent(
                                 setComponent(
                                     ComponentName(
                                         "com.android.permissioncontroller",
-                                        if (Build.HARDWARE.lowercase().contentEquals("sparrow")) { "com.android.permissioncontroller.permission.ui.pico.AppPermissionsActivity" } else { "com.android.packageinstaller.permission.ui.pico.AppPermissionsActivity" }
+                                        if (getSystemProperty("ro.product.name").contentEquals("sparrow")) { "com.android.permissioncontroller.permission.ui.pico.AppPermissionsActivity" } else { "com.android.packageinstaller.permission.ui.pico.AppPermissionsActivity" }
                                     )
                                 )
                                 putExtra(

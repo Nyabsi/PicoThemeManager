@@ -7,4 +7,5 @@
     <string name="toast_no_permission">Вам необходимо предоставить разрешение android.permission.WRITE_SECURE_SETTINGS через ADB!</string>
     <string name="toast_refresh_environments">Окружения обновлены!</string>
     <string name="button_reset_environment">Сбросить окружение</string>
+    <string name="resolution_change_unavailable">Обновите VRShell до версии 2.7.4 или выше.</string>
 </resources>

@@ -8,7 +8,6 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -16,17 +15,21 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Build
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
@@ -39,21 +42,26 @@ import androidx.core.app.ActivityCompat
 import cc.sovellus.picothememanager.manager.EnvironmentManager
 import cc.sovellus.picothememanager.ui.components.DisplayEnvironments
 import cc.sovellus.picothememanager.ui.components.DisplayFeaturedEnvironments
+import cc.sovellus.picothememanager.ui.components.ResolutionDropdown
 import cc.sovellus.picothememanager.ui.theme.ThemetoolTheme
+import cc.sovellus.picothememanager.utils.checkSecurePermission
 import kotlinx.coroutines.flow.MutableStateFlow
-
 
 class MainActivity : ComponentActivity() {
 
     private lateinit var environmentManager: EnvironmentManager
-
     private var systemPackageStateFlow = MutableStateFlow(mutableStateListOf<PackageInfo>())
     private var customPackageStateFlow = MutableStateFlow(mutableStateListOf<PackageInfo>())
 
-    override fun onResume() {
-        super.onResume()
+    private fun updateThemes() {
         systemPackageStateFlow.value = environmentManager.getSystemPackageList()
         customPackageStateFlow.value = environmentManager.getPackageList()
+        environmentManager.clearThumbnailCache()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        updateThemes()
     }
 
     @OptIn(ExperimentalMaterial3Api::class)
@@ -62,14 +70,15 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
 
         environmentManager = EnvironmentManager(this)
-        systemPackageStateFlow.value = environmentManager.getSystemPackageList()
-        customPackageStateFlow.value = environmentManager.getPackageList()
+
+        updateThemes()
 
         setContent {
             ThemetoolTheme {
                 val systemPackages = systemPackageStateFlow.collectAsState()
                 val customPackages = customPackageStateFlow.collectAsState()
                 val context = LocalContext.current
+
                 Scaffold(
                     topBar = {
                         TopAppBar(
@@ -83,16 +92,45 @@ class MainActivity : ComponentActivity() {
                             },
                             colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Transparent),
                             actions = {
-                                Icon(Icons.Filled.Refresh, contentDescription = null, modifier = Modifier.padding(16.dp).clickable(onClick = {
-                                    systemPackageStateFlow.value = environmentManager.getSystemPackageList()
-                                    customPackageStateFlow.value = environmentManager.getPackageList()
+                                val menuExpanded = remember { mutableStateOf(false) }
+                                ResolutionDropdown(menuExpanded, environmentManager)
+
+                                IconButton(onClick = {
+                                    if (!environmentManager.isResolutionOptionAvailable()) {
+                                        Toast.makeText(
+                                            context,
+                                            context.getString(R.string.resolution_change_unavailable),
+                                            Toast.LENGTH_SHORT
+                                        ).show()
+                                        return@IconButton
+                                    }
+
+                                    context.checkSecurePermission {
+                                        menuExpanded.value = true
+                                    }
+                                }) {
+                                    Icon(
+                                        Icons.Filled.Build,
+                                        contentDescription = null,
+                                        tint = if (environmentManager.isResolutionOptionAvailable()) {
+                                            Color.White
+                                        } else {
+                                            Color.Gray
+                                        }
+                                    )
+                                }
+
+                                IconButton(onClick = {
+                                    updateThemes()
 
                                     Toast.makeText(
                                         context,
                                         context.getString(R.string.toast_refresh_environments),
                                         Toast.LENGTH_SHORT
                                     ).show()
-                                }), tint = Color.White)
+                                }) {
+                                    Icon(Icons.Filled.Refresh, contentDescription = null, tint = Color.White)
+                                }
                             }
                         )
                     },
@@ -102,24 +140,17 @@ class MainActivity : ComponentActivity() {
                             containerColor = Color(0xff424242),
                             contentColor = Color(0xffffffff),
                             onClick = {
-                                if (ActivityCompat.checkSelfPermission(
-                                        this, Constants.ANDROID_PERMISSION_SECURE_SETTINGS
-                                    ) == PackageManager.PERMISSION_GRANTED
-                                ) {
+                                context.checkSecurePermission {
                                     environmentManager.resetEnvironment()
-                                } else {
-                                    Toast.makeText(
-                                        this,
-                                        this.getString(R.string.toast_no_permission),
-                                        Toast.LENGTH_LONG
-                                    ).show()
                                 }
                             },
                             icon = { Icon(Icons.Filled.Clear, null) },
                             text = { Text(text = this.getString(R.string.button_reset_environment)) },
                         )
                     },
-                    modifier = Modifier.fillMaxSize().background(color = Color(0xff292929), shape = RoundedCornerShape(32.dp))) { innerPadding ->
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(color = Color(0xff292929), shape = RoundedCornerShape(32.dp))) { innerPadding ->
                     Column(
                         modifier = Modifier
                             .padding(

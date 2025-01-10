@@ -10,6 +10,8 @@ import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.runtime.toMutableStateList
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
+import cc.sovellus.picothememanager.Constants.PICO_VRSHELL
+import cc.sovellus.picothememanager.Constants.VRSHELL_MINIMUM_VERSION_FOR_RESOLUTION
 
 class EnvironmentManager(
     context: Context
@@ -38,6 +40,14 @@ class EnvironmentManager(
 
     fun clearThumbnailCache() {
         cachedThumbnails.clear()
+    }
+
+    fun isResolutionOptionAvailable(): Boolean {
+        return packageManager.getPackageInfo(PICO_VRSHELL, 0).longVersionCode >= VRSHELL_MINIMUM_VERSION_FOR_RESOLUTION
+    }
+
+    fun setShellResolution(resolution: Int) {
+        Settings.Global.putString(contentResolver, "sys_set_vrshell_eyebuffer", resolution.toString())
     }
 
     fun getPackageList(): SnapshotStateList<PackageInfo> {

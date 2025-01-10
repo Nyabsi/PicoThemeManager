@@ -2,8 +2,6 @@ package cc.sovellus.picothememanager.ui.components
 
 import android.content.ComponentName
 import android.content.Intent
-import android.content.pm.PackageManager
-import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.hoverable
@@ -36,12 +34,10 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
-import androidx.core.app.ActivityCompat
-import cc.sovellus.picothememanager.Constants
 import cc.sovellus.picothememanager.Constants.PICO_SCENE_MANAGER
-import cc.sovellus.picothememanager.R
 import cc.sovellus.picothememanager.manager.EnvironmentManager
-import cc.sovellus.picothememanager.utils.getSystemProperty
+import cc.sovellus.picothememanager.utils.checkSecurePermission
+import cc.sovellus.picothememanager.utils.requestPicoDeletion
 
 @Composable
 fun ThemeComponent(
@@ -68,19 +64,8 @@ fun ThemeComponent(
             .width(200.dp)
             .clip(RoundedCornerShape(10))
             .clickable(onClick = {
-                if (ActivityCompat.checkSelfPermission(
-                        context, Constants.ANDROID_PERMISSION_SECURE_SETTINGS
-                    ) == PackageManager.PERMISSION_GRANTED
-                ) {
+                context.checkSecurePermission {
                     environmentManager.applyEnvironment(packageName, sceneTag)
-                } else {
-                    Toast
-                        .makeText(
-                            context,
-                            context.getString(R.string.toast_no_permission),
-                            Toast.LENGTH_LONG
-                        )
-                        .show()
                 }
             })
             .hoverable(interactionSource),
@@ -124,23 +109,7 @@ fun ThemeComponent(
                             .width(32.dp)
                             .height(32.dp),
                         onClick = {
-                            Intent().apply {
-                                setComponent(
-                                    ComponentName(
-                                        "com.android.permissioncontroller",
-                                        if (getSystemProperty("ro.product.name").contentEquals("sparrow")) { "com.android.permissioncontroller.permission.ui.pico.AppPermissionsActivity" } else { "com.android.packageinstaller.permission.ui.pico.AppPermissionsActivity" }
-                                    )
-                                )
-                                putExtra(
-                                    "android.intent.extra.PACKAGE_NAME",
-                                    packageName
-                                )
-                                putExtra(
-                                    "pico_permission_app_name", sceneName
-                                )
-                            }.run {
-                                context.startActivity(this)
-                            }
+                            context.requestPicoDeletion(packageName, sceneName)
                         }) {
                         Icon(
                             imageVector = Icons.Filled.Delete,

@@ -4,15 +4,51 @@ import android.content.Context
 import android.content.ContextWrapper
 import android.content.pm.PackageInfo
 import android.content.pm.PackageManager.GET_SIGNING_CERTIFICATES
+import android.graphics.BitmapFactory
 import android.provider.Settings
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.runtime.toMutableStateList
+import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.asImageBitmap
+import cc.sovellus.picothememanager.Constants.PICO_VRSHELL
+import cc.sovellus.picothememanager.Constants.VRSHELL_MINIMUM_VERSION_FOR_RESOLUTION
 
 class EnvironmentManager(
     context: Context
 ) : ContextWrapper(context) {
 
-    private var previousSelection: String = ""
+    private var previousSelection = ""
+    private val cachedThumbnails = mutableMapOf<String, ImageBitmap>()
+
+    fun getThumbnail(pkg: String, tag: String): ImageBitmap {
+        val key = "$pkg/$tag"
+
+        val cached = cachedThumbnails[key]
+        if (cached != null) {
+            return cached
+        }
+
+        val assets = packageManager.getResourcesForApplication(pkg).assets
+        val bitmap = BitmapFactory
+            .decodeStream(assets.open("thumbs/${tag}/Scene_${tag}_1_1.png"))
+            .asImageBitmap()
+        assets.close()
+
+        cachedThumbnails[key] = bitmap
+        return bitmap
+    }
+
+    fun clearThumbnailCache() {
+        cachedThumbnails.clear()
+    }
+
+    fun isResolutionOptionAvailable(): Boolean {
+        return packageManager.getPackageInfo(PICO_VRSHELL, 0).longVersionCode >= VRSHELL_MINIMUM_VERSION_FOR_RESOLUTION
+    }
+
+    fun setShellResolution(resolution: Int) {
+        Settings.Global.putString(contentResolver, "sys_set_vrshell_eyebuffer", resolution.toString())
+    }
 
     fun getPackageList(): SnapshotStateList<PackageInfo> {
         return packageManager.getInstalledPackages(GET_SIGNING_CERTIFICATES).filter { packageInfo ->

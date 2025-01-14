@@ -2,10 +2,6 @@ package cc.sovellus.picothememanager.ui.components
 
 import android.content.ComponentName
 import android.content.Intent
-import android.content.pm.PackageManager
-import android.graphics.BitmapFactory
-import android.os.Build
-import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.hoverable
@@ -27,24 +23,21 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
-import androidx.core.app.ActivityCompat
-import cc.sovellus.picothememanager.Constants
 import cc.sovellus.picothememanager.Constants.PICO_SCENE_MANAGER
-import cc.sovellus.picothememanager.R
 import cc.sovellus.picothememanager.manager.EnvironmentManager
-import cc.sovellus.picothememanager.utils.getSystemProperty
+import cc.sovellus.picothememanager.utils.checkSecurePermission
+import cc.sovellus.picothememanager.utils.requestPicoDeletion
 
 @Composable
 fun ThemeComponent(
@@ -54,13 +47,14 @@ fun ThemeComponent(
     sceneName: String
 ) {
     val context = LocalContext.current
-    val assets = context.packageManager.getResourcesForApplication(packageName).assets
-    val bitmap = remember(sceneTag) { BitmapFactory.decodeStream(assets.open("thumbs/${sceneTag}/Scene_${sceneTag}_1_1.png")) }
-
+    val bitmapRoutine = rememberCoroutineScope()
+    val bitmap = remember(sceneTag) {
+        bitmapRoutine.run {
+            environmentManager.getThumbnail(packageName, sceneTag)
+        }
+    }
     val interactionSource = remember { MutableInteractionSource() }
     val isHovered by interactionSource.collectIsHoveredAsState()
-
-    assets.close()
 
     Box(
         modifier = Modifier
@@ -70,26 +64,15 @@ fun ThemeComponent(
             .width(200.dp)
             .clip(RoundedCornerShape(10))
             .clickable(onClick = {
-                if (ActivityCompat.checkSelfPermission(
-                        context, Constants.ANDROID_PERMISSION_SECURE_SETTINGS
-                    ) == PackageManager.PERMISSION_GRANTED
-                ) {
+                context.checkSecurePermission {
                     environmentManager.applyEnvironment(packageName, sceneTag)
-                } else {
-                    Toast
-                        .makeText(
-                            context,
-                            context.getString(R.string.toast_no_permission),
-                            Toast.LENGTH_LONG
-                        )
-                        .show()
                 }
             })
             .hoverable(interactionSource),
         contentAlignment = Alignment.TopStart
     ) {
         Image(
-            bitmap = bitmap.asImageBitmap(),
+            bitmap = bitmap,
             contentDescription = null,
             modifier = Modifier
                 .fillMaxWidth()
@@ -126,23 +109,7 @@ fun ThemeComponent(
                             .width(32.dp)
                             .height(32.dp),
                         onClick = {
-                            Intent().apply {
-                                setComponent(
-                                    ComponentName(
-                                        "com.android.permissioncontroller",
-                                        if (getSystemProperty("ro.product.name").contentEquals("sparrow")) { "com.android.permissioncontroller.permission.ui.pico.AppPermissionsActivity" } else { "com.android.packageinstaller.permission.ui.pico.AppPermissionsActivity" }
-                                    )
-                                )
-                                putExtra(
-                                    "android.intent.extra.PACKAGE_NAME",
-                                    packageName
-                                )
-                                putExtra(
-                                    "pico_permission_app_name", sceneName
-                                )
-                            }.run {
-                                context.startActivity(this)
-                            }
+                            context.requestPicoDeletion(packageName, sceneName)
                         }) {
                         Icon(
                             imageVector = Icons.Filled.Delete,

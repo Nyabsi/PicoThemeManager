@@ -8,7 +8,6 @@
     <uses-permission android:name="android.permission.READ_MEDIA_AUDIO" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE"/>
-    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
 
     <queries>
         <package android:name="com.pvr.vrshell"/>
@@ -39,14 +38,6 @@
 
         <meta-data android:name="isPUI" android:value="1"/>
         <meta-data android:name="pvr.vrshell.mode" android:value="1"/>
-
-        <receiver android:name=".receiver.BootReceiver"
-            android:exported="true">
-            <intent-filter>
-                <action android:name="android.intent.action.BOOT_COMPLETED" />
-                <category android:name="android.intent.category.DEFAULT" />
-            </intent-filter>
-        </receiver>
 
         <service android:name=".service.AudioService" android:foregroundServiceType="specialUse"/>
     </application>

@@ -13,6 +13,7 @@ import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
 import cc.sovellus.picothememanager.Constants.PICO_VRSHELL
 import cc.sovellus.picothememanager.Constants.VRSHELL_MINIMUM_VERSION_FOR_RESOLUTION
+import cc.sovellus.picothememanager.extension.audioOnStart
 import cc.sovellus.picothememanager.extension.lastUsedTheme
 import cc.sovellus.picothememanager.service.AudioService
 
@@ -20,9 +21,9 @@ class EnvironmentManager(
     context: Context
 ) : ContextWrapper(context) {
 
-    private var previousSelection = ""
-    private val cachedThumbnails = mutableMapOf<String, ImageBitmap>()
     private val preferences = getSharedPreferences("pico_theme_manager_prefs", MODE_PRIVATE)
+    private var previousSelection = preferences.lastUsedTheme
+    private val cachedThumbnails = mutableMapOf<String, ImageBitmap>()
 
     fun getThumbnail(pkg: String, tag: String): ImageBitmap {
         val key = "$pkg/$tag"
@@ -73,6 +74,8 @@ class EnvironmentManager(
         Settings.Global.putInt(contentResolver, "current_support_skybox", 0)
         Settings.Global.putString(contentResolver, "current_scene_custom", null)
         Settings.Global.putString(contentResolver, "scene_change_type", "${System.currentTimeMillis()}1")
+
+        preferences.lastUsedTheme = ""
         previousSelection = ""
     }
 
@@ -94,19 +97,17 @@ class EnvironmentManager(
                 stopService(serviceIntent)
             }
 
+            preferences.audioOnStart = hasAudio
             preferences.lastUsedTheme = pkg
             previousSelection = tag
         }
     }
 
     fun playEnvironmentAudio() {
-        if (preferences.lastUsedTheme.isNotEmpty()) {
-            val hasAudio = packageManager.getResourcesForApplication(preferences.lastUsedTheme).assets.list("audio")?.isNotEmpty()
-            if (hasAudio == true) {
-                val serviceIntent = Intent(this, AudioService::class.java)
-                serviceIntent.putExtra("packageName", preferences.lastUsedTheme)
-                startForegroundService(serviceIntent)
-            }
+        if (preferences.audioOnStart) {
+            val serviceIntent = Intent(this, AudioService::class.java)
+            serviceIntent.putExtra("packageName", preferences.lastUsedTheme)
+            startForegroundService(serviceIntent)
         }
     }
 

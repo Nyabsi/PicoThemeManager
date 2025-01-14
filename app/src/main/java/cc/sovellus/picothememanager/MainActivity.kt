@@ -79,18 +79,6 @@ class MainActivity : ComponentActivity() {
 
         updateThemes()
 
-        if (ActivityCompat.checkSelfPermission(
-                this,
-                android.Manifest.permission.RECEIVE_BOOT_COMPLETED
-            ) != PackageManager.PERMISSION_GRANTED
-        ) {
-            ActivityCompat.requestPermissions(
-                this,
-                arrayOf(android.Manifest.permission.RECEIVE_BOOT_COMPLETED),
-                0
-            )
-        }
-
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             if (ActivityCompat.checkSelfPermission(
                     this,

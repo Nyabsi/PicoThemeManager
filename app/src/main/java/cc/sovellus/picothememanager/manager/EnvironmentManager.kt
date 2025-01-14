@@ -2,6 +2,7 @@ package cc.sovellus.picothememanager.manager
 
 import android.content.Context
 import android.content.ContextWrapper
+import android.content.Intent
 import android.content.pm.PackageInfo
 import android.content.pm.PackageManager.GET_SIGNING_CERTIFICATES
 import android.graphics.BitmapFactory
@@ -12,6 +13,8 @@ import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
 import cc.sovellus.picothememanager.Constants.PICO_VRSHELL
 import cc.sovellus.picothememanager.Constants.VRSHELL_MINIMUM_VERSION_FOR_RESOLUTION
+import cc.sovellus.picothememanager.extension.lastUsedTheme
+import cc.sovellus.picothememanager.service.AudioService
 
 class EnvironmentManager(
     context: Context
@@ -19,6 +22,7 @@ class EnvironmentManager(
 
     private var previousSelection = ""
     private val cachedThumbnails = mutableMapOf<String, ImageBitmap>()
+    private val preferences = getSharedPreferences("pico_theme_manager_prefs", MODE_PRIVATE)
 
     fun getThumbnail(pkg: String, tag: String): ImageBitmap {
         val key = "$pkg/$tag"
@@ -72,12 +76,25 @@ class EnvironmentManager(
         previousSelection = ""
     }
 
-    fun applyEnvironment(pkg: String, tag: String) {
+    fun applyEnvironment(pkg: String, tag: String, hasAudio: Boolean) {
         if (previousSelection != tag) {
             Settings.Global.putString(contentResolver, "SceneManager.CurPackage", pkg)
             Settings.Global.putString(contentResolver, "SceneManager.CurrentScene", tag)
             Settings.Global.putString(contentResolver, "current_scene", "/assets/scene/$tag/Scene_${tag}_1_1.unity3d")
             Settings.Global.putString(contentResolver, "scene_change_type", "${System.currentTimeMillis()}1")
+
+            if (hasAudio) {
+                val serviceIntent = Intent(this, AudioService::class.java)
+                stopService(serviceIntent)
+
+                serviceIntent.putExtra("packageName", pkg)
+                startForegroundService(serviceIntent)
+            } else {
+                val serviceIntent = Intent(this, AudioService::class.java)
+                stopService(serviceIntent)
+            }
+
+            preferences.lastUsedTheme = pkg
             previousSelection = tag
         }
     }

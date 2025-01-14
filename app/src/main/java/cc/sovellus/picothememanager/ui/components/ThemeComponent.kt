@@ -47,12 +47,17 @@ fun ThemeComponent(
     sceneName: String
 ) {
     val context = LocalContext.current
+
     val bitmapRoutine = rememberCoroutineScope()
     val bitmap = remember(sceneTag) {
         bitmapRoutine.run {
             environmentManager.getThumbnail(packageName, sceneTag)
         }
     }
+
+    val assets = context.packageManager.getResourcesForApplication(packageName).assets
+    val hasAudio = remember(sceneTag) { assets.list("audio")?.isNotEmpty() == true }
+
     val interactionSource = remember { MutableInteractionSource() }
     val isHovered by interactionSource.collectIsHoveredAsState()
 
@@ -65,8 +70,8 @@ fun ThemeComponent(
             .clip(RoundedCornerShape(10))
             .clickable(onClick = {
                 context.checkSecurePermission {
-                    environmentManager.applyEnvironment(packageName, sceneTag)
-                }
+                    environmentManager.applyEnvironment(packageName, sceneTag, hasAudio)
+                    }
             })
             .hoverable(interactionSource),
         contentAlignment = Alignment.TopStart

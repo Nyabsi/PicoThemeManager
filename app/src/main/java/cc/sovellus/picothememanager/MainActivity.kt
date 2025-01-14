@@ -1,7 +1,11 @@
 package cc.sovellus.picothememanager
 
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.content.Context
 import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.ComponentActivity
@@ -72,6 +76,54 @@ class MainActivity : ComponentActivity() {
         environmentManager = EnvironmentManager(this)
 
         updateThemes()
+
+        if (ActivityCompat.checkSelfPermission(
+                this,
+                android.Manifest.permission.RECEIVE_BOOT_COMPLETED
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
+            ActivityCompat.requestPermissions(
+                this,
+                arrayOf(android.Manifest.permission.RECEIVE_BOOT_COMPLETED),
+                0
+            )
+        }
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (ActivityCompat.checkSelfPermission(
+                    this,
+                    android.Manifest.permission.READ_MEDIA_AUDIO
+                ) != PackageManager.PERMISSION_GRANTED
+            ) {
+                ActivityCompat.requestPermissions(
+                    this,
+                    arrayOf(android.Manifest.permission.READ_MEDIA_AUDIO),
+                    0
+                )
+            }
+        } else {
+            if (ActivityCompat.checkSelfPermission(
+                    this,
+                    android.Manifest.permission.READ_EXTERNAL_STORAGE
+                ) != PackageManager.PERMISSION_GRANTED
+            ) {
+                ActivityCompat.requestPermissions(
+                    this,
+                    arrayOf(android.Manifest.permission.READ_EXTERNAL_STORAGE),
+                    0
+                )
+            }
+        }
+
+        val notificationManager: NotificationManager = this.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+
+        val defaultChannel = NotificationChannel(
+            "default_channel",
+            "Default",
+            NotificationManager.IMPORTANCE_LOW
+        )
+
+        notificationManager.createNotificationChannel(defaultChannel)
 
         setContent {
             ThemetoolTheme {

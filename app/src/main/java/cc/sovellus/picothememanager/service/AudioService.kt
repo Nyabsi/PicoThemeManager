@@ -7,16 +7,37 @@ import android.media.MediaPlayer
 import android.os.Build
 import android.os.IBinder
 import androidx.core.app.NotificationCompat
+import cc.sovellus.picothememanager.Constants.NOTIFICATION_CHANNEL_DEFAULT
+import cc.sovellus.picothememanager.Constants.PICO_VRSHELL
+import cc.sovellus.picothememanager.Constants.PROP_MRSERVICE
 import cc.sovellus.picothememanager.R
-import java.io.File
-import java.io.FileInputStream
-import java.io.FileOutputStream
+import cc.sovellus.picothememanager.utils.getSystemProperty
 import java.io.IOException
+import java.util.concurrent.Executors
+import java.util.concurrent.ScheduledExecutorService
+import java.util.concurrent.TimeUnit
 
 
 class AudioService : Service() {
 
     private lateinit var mediaPlayer: MediaPlayer
+    private var isPlaying: Boolean = false
+    private var lastPackageName: String = ""
+
+    private val scheduler: ScheduledExecutorService = Executors.newScheduledThreadPool(1)
+
+    private var checkCurrentApplication: Runnable = Runnable {
+        val currentApplication = getSystemProperty(PROP_MRSERVICE)
+        if (currentApplication != PICO_VRSHELL && isPlaying)
+        {
+            mediaPlayer.pause()
+            isPlaying = false
+        } else if (currentApplication == PICO_VRSHELL && !isPlaying)
+        {
+            mediaPlayer.start()
+            isPlaying = true
+        }
+    }
 
     override fun onBind(intent: Intent?): IBinder? {
         return null
@@ -29,10 +50,13 @@ class AudioService : Service() {
         val packageName = intent.getStringExtra("packageName")
 
         packageName?.let {
+            lastPackageName = packageName
             playAudio(packageName)
         }
 
-        val builder = NotificationCompat.Builder(this, "default_channel")
+        scheduler.scheduleWithFixedDelay(checkCurrentApplication, 1000, 1000, TimeUnit.MILLISECONDS)
+
+        val builder = NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_DEFAULT)
             .setSmallIcon(R.mipmap.ic_launcher)
             .setContentTitle("AudioService")
             .setContentText("this service enables audio for themes.")
@@ -56,6 +80,7 @@ class AudioService : Service() {
 
             val fd = packageManager.getResourcesForApplication(packageName).assets.openFd("audio/audio.ogg")
 
+            mediaPlayer.reset()
             mediaPlayer.setDataSource(fd)
             mediaPlayer.prepare()
 
@@ -64,8 +89,11 @@ class AudioService : Service() {
             mediaPlayer.start()
             mediaPlayer.isLooping = true
 
+            isPlaying = true
+
         } catch (e: IOException) {
             e.printStackTrace()
+            isPlaying = false
         }
     }
 
@@ -74,5 +102,6 @@ class AudioService : Service() {
 
         mediaPlayer.stop()
         mediaPlayer.release()
+        isPlaying = false
     }
 }

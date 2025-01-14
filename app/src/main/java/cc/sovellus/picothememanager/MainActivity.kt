@@ -43,6 +43,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.app.ActivityCompat
+import cc.sovellus.picothememanager.Constants.NOTIFICATION_CHANNEL_DEFAULT
 import cc.sovellus.picothememanager.manager.EnvironmentManager
 import cc.sovellus.picothememanager.ui.components.DisplayEnvironments
 import cc.sovellus.picothememanager.ui.components.DisplayFeaturedEnvironments
@@ -118,7 +119,7 @@ class MainActivity : ComponentActivity() {
         val notificationManager: NotificationManager = this.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
         val defaultChannel = NotificationChannel(
-            "default_channel",
+            NOTIFICATION_CHANNEL_DEFAULT,
             "Default",
             NotificationManager.IMPORTANCE_LOW
         )

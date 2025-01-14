@@ -75,6 +75,7 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
 
         environmentManager = EnvironmentManager(this)
+        environmentManager.playEnvironmentAudio()
 
         updateThemes()
 

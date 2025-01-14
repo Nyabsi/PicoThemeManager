@@ -12,7 +12,7 @@ class BootReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
         if (Intent.ACTION_BOOT_COMPLETED == intent.action) {
             val preferences = context.getSharedPreferences("pico_theme_manager_prefs", MODE_PRIVATE)
-            if (preferences.lastUsedTheme.isEmpty()) {
+            if (preferences.lastUsedTheme.isNotEmpty()) {
                 val hasAudio = context.packageManager.getResourcesForApplication(preferences.lastUsedTheme).assets.list("audio")?.isNotEmpty()
                 if (hasAudio == true) {
                     val serviceIntent = Intent(context, AudioService::class.java)

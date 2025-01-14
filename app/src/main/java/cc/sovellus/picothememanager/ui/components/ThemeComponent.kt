@@ -55,8 +55,8 @@ fun ThemeComponent(
         }
     }
 
-    val assets = context.packageManager.getResourcesForApplication(packageName).assets
-    val hasAudio = remember(sceneTag) { assets.list("audio")?.isNotEmpty() == true }
+    val resources = context.packageManager.getResourcesForApplication(packageName)
+    val backgroundMusicEnabled = remember { resources.getIdentifier("backgroundMusic", "int", packageName) > 0 }
 
     val interactionSource = remember { MutableInteractionSource() }
     val isHovered by interactionSource.collectIsHoveredAsState()
@@ -70,8 +70,8 @@ fun ThemeComponent(
             .clip(RoundedCornerShape(10))
             .clickable(onClick = {
                 context.checkSecurePermission {
-                    environmentManager.applyEnvironment(packageName, sceneTag, hasAudio)
-                    }
+                    environmentManager.applyEnvironment(packageName, sceneTag, backgroundMusicEnabled)
+                }
             })
             .hoverable(interactionSource),
         contentAlignment = Alignment.TopStart

@@ -79,14 +79,14 @@ class EnvironmentManager(
         previousSelection = ""
     }
 
-    fun applyEnvironment(pkg: String, tag: String, hasAudio: Boolean) {
+    fun applyEnvironment(pkg: String, tag: String, hasBackgroundMusic: Boolean) {
         if (previousSelection != tag) {
             Settings.Global.putString(contentResolver, "SceneManager.CurPackage", pkg)
             Settings.Global.putString(contentResolver, "SceneManager.CurrentScene", tag)
             Settings.Global.putString(contentResolver, "current_scene", "/assets/scene/$tag/Scene_${tag}_1_1.unity3d")
             Settings.Global.putString(contentResolver, "scene_change_type", "${System.currentTimeMillis()}1")
 
-            if (hasAudio) {
+            if (hasBackgroundMusic) {
                 val serviceIntent = Intent(this, AudioService::class.java)
                 stopService(serviceIntent)
 
@@ -97,7 +97,7 @@ class EnvironmentManager(
                 stopService(serviceIntent)
             }
 
-            preferences.audioOnStart = hasAudio
+            preferences.audioOnStart = hasBackgroundMusic
             preferences.lastUsedTheme = pkg
             previousSelection = tag
         }

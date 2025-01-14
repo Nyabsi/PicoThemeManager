@@ -92,7 +92,7 @@ class AudioService : Service() {
     private fun playAudio(packageName: String) {
         try {
 
-            val fd = packageManager.getResourcesForApplication(packageName).assets.openFd("audio/audio.ogg")
+            val fd = packageManager.getResourcesForApplication(packageName).assets.openFd("audio/background.ogg")
 
             mediaPlayer.reset()
             mediaPlayer.setDataSource(fd)

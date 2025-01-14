@@ -9,6 +9,7 @@ object Constants {
     const val APP_PERMISSIONS_ACTIVITY_LEGACY = "com.android.packageinstaller.permission.ui.pico.AppPermissionsActivity"
     const val VRSHELL_MINIMUM_VERSION_FOR_RESOLUTION = 200704000
     const val PROP_MRSERVICE = "sys.pxr.mrserivce.user"
+    const val PROP_SCREEN_STATE = "debug.tracing.screen_state"
     const val NOTIFICATION_CHANNEL_DEFAULT = "default_channel"
     val IGNORE_ENVIRONMENTS = listOf("default_scene", "AIGC", "Emulator", "Default")
 }

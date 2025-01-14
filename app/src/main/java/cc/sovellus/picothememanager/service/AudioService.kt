@@ -3,13 +3,16 @@ package cc.sovellus.picothememanager.service
 import android.app.Service
 import android.content.Intent
 import android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_SPECIAL_USE
+import android.hardware.display.DisplayManager
 import android.media.MediaPlayer
 import android.os.Build
 import android.os.IBinder
+import android.view.Display
 import androidx.core.app.NotificationCompat
 import cc.sovellus.picothememanager.Constants.NOTIFICATION_CHANNEL_DEFAULT
 import cc.sovellus.picothememanager.Constants.PICO_VRSHELL
 import cc.sovellus.picothememanager.Constants.PROP_MRSERVICE
+import cc.sovellus.picothememanager.Constants.PROP_SCREEN_STATE
 import cc.sovellus.picothememanager.R
 import cc.sovellus.picothememanager.utils.getSystemProperty
 import java.io.IOException
@@ -26,7 +29,7 @@ class AudioService : Service() {
 
     private val scheduler: ScheduledExecutorService = Executors.newScheduledThreadPool(1)
 
-    private var checkCurrentApplication: Runnable = Runnable {
+    private var checkShouldWePlayAudio: Runnable = Runnable {
         val currentApplication = getSystemProperty(PROP_MRSERVICE)
         if (currentApplication != PICO_VRSHELL && isPlaying)
         {
@@ -34,6 +37,17 @@ class AudioService : Service() {
             isPlaying = false
         } else if (currentApplication == PICO_VRSHELL && !isPlaying)
         {
+            mediaPlayer.start()
+            isPlaying = true
+        }
+
+        val screenState = getSystemProperty(PROP_SCREEN_STATE)?.toInt() ?: -1
+
+        if (screenState == 1 && isPlaying) {
+            mediaPlayer.pause()
+            isPlaying = false
+        }
+        else if (screenState == 2 && !isPlaying) {
             mediaPlayer.start()
             isPlaying = true
         }
@@ -54,7 +68,7 @@ class AudioService : Service() {
             playAudio(packageName)
         }
 
-        scheduler.scheduleWithFixedDelay(checkCurrentApplication, 1000, 1000, TimeUnit.MILLISECONDS)
+        scheduler.scheduleWithFixedDelay(checkShouldWePlayAudio, 1000, 1000, TimeUnit.MILLISECONDS)
 
         val builder = NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_DEFAULT)
             .setSmallIcon(R.mipmap.ic_launcher)

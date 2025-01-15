@@ -56,7 +56,7 @@ fun ThemeComponent(
     }
 
     val resources = context.packageManager.getResourcesForApplication(packageName)
-    val backgroundMusicEnabled = remember { resources.getIdentifier("backgroundMusic", "int", packageName) > 0 }
+    val backgroundMusicEnabled = remember(packageName) { resources.getIdentifier("backgroundMusic", "integer", packageName) > 0 }
 
     val interactionSource = remember { MutableInteractionSource() }
     val isHovered by interactionSource.collectIsHoveredAsState()

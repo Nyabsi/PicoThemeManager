@@ -7,4 +7,5 @@
     <string name="toast_refresh_environments">Environments reloaded!</string>
     <string name="button_reset_environment">Reset Environment</string>
     <string name="resolution_change_unavailable">Update VRShell to version 2.7.4 or higher.</string>
+    <string name="theme_contains_audio">Contains audio</string>
 </resources>

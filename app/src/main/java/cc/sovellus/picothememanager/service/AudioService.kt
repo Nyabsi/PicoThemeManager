@@ -3,11 +3,9 @@ package cc.sovellus.picothememanager.service
 import android.app.Service
 import android.content.Intent
 import android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_SPECIAL_USE
-import android.hardware.display.DisplayManager
 import android.media.MediaPlayer
 import android.os.Build
 import android.os.IBinder
-import android.view.Display
 import androidx.core.app.NotificationCompat
 import cc.sovellus.picothememanager.Constants.NOTIFICATION_CHANNEL_DEFAULT
 import cc.sovellus.picothememanager.Constants.PICO_VRSHELL

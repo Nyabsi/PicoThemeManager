@@ -2,7 +2,6 @@ package cc.sovellus.picothememanager
 
 import android.app.NotificationChannel
 import android.app.NotificationManager
-import android.content.Context
 import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
 import android.os.Build
@@ -106,7 +105,7 @@ class MainActivity : ComponentActivity() {
             }
         }
 
-        val notificationManager: NotificationManager = this.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        val notificationManager: NotificationManager = this.getSystemService(NOTIFICATION_SERVICE) as NotificationManager
 
         val defaultChannel = NotificationChannel(
             NOTIFICATION_CHANNEL_DEFAULT,

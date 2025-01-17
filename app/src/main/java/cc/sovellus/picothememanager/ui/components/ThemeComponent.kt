@@ -1,7 +1,5 @@
 package cc.sovellus.picothememanager.ui.components
 
-import android.content.ComponentName
-import android.content.Intent
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.hoverable
@@ -9,6 +7,7 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsHoveredAsState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -16,6 +15,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.VolumeUp
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -30,11 +30,14 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
 import cc.sovellus.picothememanager.Constants.PICO_SCENE_MANAGER
+import cc.sovellus.picothememanager.R
 import cc.sovellus.picothememanager.manager.EnvironmentManager
 import cc.sovellus.picothememanager.utils.checkSecurePermission
 import cc.sovellus.picothememanager.utils.requestPicoDeletion
@@ -56,7 +59,7 @@ fun ThemeComponent(
     }
 
     val resources = context.packageManager.getResourcesForApplication(packageName)
-    val backgroundMusicEnabled = remember { resources.getIdentifier("backgroundMusic", "int", packageName) > 0 }
+    val backgroundMusicEnabled = remember(packageName) { resources.getIdentifier("backgroundMusic", "integer", packageName) > 0 }
 
     val interactionSource = remember { MutableInteractionSource() }
     val isHovered by interactionSource.collectIsHoveredAsState()
@@ -80,7 +83,6 @@ fun ThemeComponent(
             bitmap = bitmap,
             contentDescription = null,
             modifier = Modifier
-                .fillMaxWidth()
                 .height(120.dp)
                 .width(200.dp)
                 .zIndex(0f),
@@ -92,37 +94,74 @@ fun ThemeComponent(
             },
         )
         if (isHovered) {
-            Row(
-                modifier = Modifier.width(200.dp),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.Top
+            Column(
+                modifier = Modifier
+                    .height(120.dp)
+                    .width(200.dp)
+                    .padding(4.dp),
+                verticalArrangement = Arrangement.SpaceBetween
             ) {
-                Text(
-                    text = sceneName,
+                Row(
                     modifier = Modifier
-                        .weight(1f)
-                        .padding(4.dp)
-                        .zIndex(1f),
-                    textAlign = TextAlign.Start,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                    color = Color.White
-                )
-                if (packageName != PICO_SCENE_MANAGER) {
-                    IconButton(
+                        .fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = sceneName,
                         modifier = Modifier
-                            .width(32.dp)
-                            .height(32.dp),
-                        onClick = {
-                            context.requestPicoDeletion(packageName, sceneName)
-                        }) {
+                            .weight(1f)
+                            .zIndex(1f),
+                        textAlign = TextAlign.Start,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                        color = Color.White
+                    )
+                    if (packageName != PICO_SCENE_MANAGER) {
+                        IconButton(
+                            modifier = Modifier
+                                .width(28.dp)
+                                .height(28.dp),
+                            onClick = {
+                                context.requestPicoDeletion(packageName, sceneName)
+                            }) {
+                            Icon(
+                                imageVector = Icons.Filled.Delete,
+                                contentDescription = null,
+                                tint = Color.White,
+                                modifier = Modifier
+                                    .width(20.dp)
+                                    .height(20.dp)
+                            )
+                        }
+                    }
+                }
+                if (backgroundMusicEnabled) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth(),
+                        horizontalArrangement = Arrangement.Start,
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
                         Icon(
-                            imageVector = Icons.Filled.Delete,
+                            imageVector = Icons.AutoMirrored.Filled.VolumeUp,
                             contentDescription = null,
                             tint = Color.White,
                             modifier = Modifier
-                                .width(24.dp)
-                                .height(24.dp)
+                                .width(12.dp)
+                                .height(12.dp)
+                        )
+                        Text(
+                            text = stringResource(R.string.theme_contains_audio),
+                            modifier = Modifier
+                                .weight(1f)
+                                .zIndex(1f)
+                                .padding(4.dp),
+                            textAlign = TextAlign.Start,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                            color = Color.White,
+                            fontSize = 10.sp
                         )
                     }
                 }

@@ -2,7 +2,6 @@ package cc.sovellus.picothememanager
 
 import android.app.NotificationChannel
 import android.app.NotificationManager
-import android.content.Context
 import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
 import android.os.Build
@@ -35,6 +34,7 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -105,7 +105,7 @@ class MainActivity : ComponentActivity() {
             }
         }
 
-        val notificationManager: NotificationManager = this.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        val notificationManager: NotificationManager = this.getSystemService(NOTIFICATION_SERVICE) as NotificationManager
 
         val defaultChannel = NotificationChannel(
             NOTIFICATION_CHANNEL_DEFAULT,
@@ -132,7 +132,7 @@ class MainActivity : ComponentActivity() {
                                     color = Color.White
                                 )
                             },
-                            colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Transparent),
+                            colors = TopAppBarDefaults.topAppBarColors().copy(containerColor = Color(0xff292929)),
                             actions = {
                                 val menuExpanded = remember { mutableStateOf(false) }
                                 ResolutionDropdown(menuExpanded, environmentManager)
@@ -176,7 +176,7 @@ class MainActivity : ComponentActivity() {
                             }
                         )
                     },
-                    containerColor = Color.Transparent,
+                    containerColor = Color(0xff292929),
                     floatingActionButton = {
                         ExtendedFloatingActionButton(
                             containerColor = Color(0xff424242),
@@ -192,7 +192,7 @@ class MainActivity : ComponentActivity() {
                     },
                     modifier = Modifier
                         .fillMaxSize()
-                        .background(color = Color(0xff292929), shape = RoundedCornerShape(32.dp))) { innerPadding ->
+                        .clip(RoundedCornerShape(32.dp))) { innerPadding ->
                     Column(
                         modifier = Modifier
                             .padding(

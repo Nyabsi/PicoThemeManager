@@ -24,7 +24,7 @@ adb shell pm grant cc.sovellus.picothememanager android.permission.WRITE_SECURE_
 
 ## Compatibility
 
-Compatibility with Pico OS 5.2.7 - 5.12.6 has been tested.
+Compatibility with Pico OS 5.2.7 - 5.13.3 has been tested.
 
 ### Tested Devices
 

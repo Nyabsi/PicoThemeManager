@@ -54,7 +54,9 @@ fun DisplayFeaturedEnvironments(environmentManager: EnvironmentManager) {
         modifier = Modifier.heightIn(max = 120.dp),
         content = {
             items(thumbnails) {
-                if (!IGNORE_ENVIRONMENTS.contains(it)) {
+                for (environment in IGNORE_ENVIRONMENTS) {
+                    if (it.contains(environment))
+                        continue
                     ThemeComponent(environmentManager, PICO_SCENE_MANAGER, it, it)
                 }
             }

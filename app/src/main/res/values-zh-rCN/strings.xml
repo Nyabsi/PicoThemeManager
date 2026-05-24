@@ -1,0 +1,11 @@
+<resources>
+    <string name="app_name">Pico 主题管理</string>
+    <string name="label_featured">特色</string>
+    <string name="label_more">更多</string>
+    <string name="label_custom">自定义</string>
+    <string name="toast_no_permission">你需要先在 ADB 授予 android.permission.WRITE_SECURE_SETTINGS 权限！</string>
+    <string name="toast_refresh_environments">场景列表已重载！</string>
+    <string name="button_reset_environment">重设场景</string>
+    <string name="resolution_change_unavailable">请更新 VRShell 到 2.7.4 或更高版本。</string>
+    <string name="theme_contains_audio">包含音频</string>
+</resources>
